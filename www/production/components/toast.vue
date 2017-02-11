@@ -8,7 +8,6 @@
                 <div class="tip">提示</div>
                 <div class="alt-con">{{altword}}</div>
                 <div class="btn-w">
-                    <div class="cancel" @click="cancel">取消</div>
                     <div class="ensure" @click='ensure'>确定</div>
                 </div>
             </div>
@@ -25,9 +24,6 @@ export default {
         }
     },
     methods: {
-        cancel() {
-            this.$emit("cancel");
-        },
         ensure() {
             this.$emit("ensure");
         }
@@ -99,16 +95,8 @@ export default {
     letter-spacing: 3px;
 }
 
-.cancel {
-    float: left;
-    width: 50%;
-    background: #fff;
-    color: #ff5a5f;
-}
-
 .ensure {
-    float: right;
-    width: 50%;
+    width: 100%;
     color: #fff;
     background: #ff5a5f;
 }
