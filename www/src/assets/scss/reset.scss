@@ -1,0 +1,83 @@
+@import 'mixin.scss';
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-text-size-adjust: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    -ms-touch-action: none;
+    -webkit-touch-callout: none;
+}
+body {
+    font-family: "Helvetica Neue","Hiragino Sans GB W3","Hiragino Sans GB","Microsoft YaHei","WenQuanYi Micro Hei",sans-serif;
+    font-size: 14px;
+    font-weight: 300;
+    user-select: none;
+}
+article,
+aside,
+footer,
+header,
+nav,
+section {
+  display: block;
+}
+
+html,
+body,
+#app {
+    height: 100%;
+}
+.hidden {
+    display: none;
+}
+[v-cloak] {
+    display: none;
+}
+
+.clearfix:after {
+    content: "";
+    display: table;
+}
+a {
+    text-decoration: none;
+}
+
+li {
+    list-style-type: none;
+}
+.ovh {
+    overflow: hidden;
+}
+.fr {
+    float: right;
+}
+.fl {
+    float: left;
+}
+.re {
+    position: relative;
+}
+
+input,textarea{
+    border: none;
+    outline: none;
+    // -webkit-appearance: none;
+    font-family: "Helvetica Neue","Hiragino Sans GB W3","Hiragino Sans GB","Microsoft YaHei","WenQuanYi Micro Hei",sans-serif;
+}
+textarea {
+    resize: none;
+}
+::-moz-placeholder {
+    color: #ccc;
+}
+
+::-webkit-input-placeholder {
+    color: #ccc;
+}
+
+:-ms-input-placeholder {
+    color: #ccc;
+}
+
+

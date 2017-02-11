@@ -1,0 +1,17 @@
+Options +FollowSymlinks
+IndexIgnore */*
+RewriteEngine On
+
+# if a directory or a file exists, use it directly
+
+#RewriteCond %{HTTP_HOST} !^(www.homestay.com)
+#RewriteRule ^(.*) http://www.homestay.com [L]
+
+#RewriteCond %{HTTP_USER_AGENT} "(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile)" [NC]
+#RewriteRule ^(.*) http://m.homestay.com [L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# otherwise forward it to 404.html
+RewriteRule . 404.html

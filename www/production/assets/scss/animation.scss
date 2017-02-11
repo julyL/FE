@@ -1,0 +1,34 @@
+.slideout-enter-active,
+.slideout-leave-active {
+    transition: all .3s ease;
+    transform: translate3d(0, 0, 0);
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+}
+
+.slideout-leave-active {
+    transition: all .15s ease;
+}
+
+.slideout-leave-active {
+    position: absolute;
+}
+
+.slideout-enter,
+.slideout-leave-active {
+    transform: translateY(.4rem);
+    opacity: .8;
+}
+
+.slideout-leave-active {
+    opacity: 1;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
