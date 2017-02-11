@@ -13,9 +13,6 @@ var LazyMan=function(name){
    return man;
 }
 _LazyMan.prototype.lazyrun=function(){
-    if(this.timer){
-        clearTimeout(this.timer);
-    }
     this.timer=setTimeout(()=>{
        run(this.queue);      
    },0);
@@ -59,7 +56,6 @@ _LazyMan.prototype.eat=function(food){
        name:"eat",
        param:food
     }); 
-    this.lazyrun(this.queue);
     return this;
 }
 _LazyMan.prototype.sleep=function(time){
@@ -67,7 +63,6 @@ _LazyMan.prototype.sleep=function(time){
        name:"sleep",
        param:time
     }); 
-    this.lazyrun(this.queue);
     return this;
 }
 _LazyMan.prototype.sleepFirst=function(time){
@@ -75,7 +70,6 @@ _LazyMan.prototype.sleepFirst=function(time){
        name:"sleepFirst",
        param:time
     }); 
-    this.lazyrun(this.queue);
     return this;
 }
 var date=+new Date();
