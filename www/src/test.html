@@ -1,0 +1,107 @@
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+        <meta name="screen-orientation" content="portrait"/>
+        <meta name="x5-orientation" content="portrait"/>
+        <meta name = "format-detection" content = "telephone=no">
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+        <title></title>
+    <script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+        <link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/1.1.0/weui.min.css">
+        <!-- <script src="https://res.wx.qq.com/open/libs/weuijs/1.0.0/weui.min.js"></script> -->
+        <script src="https://res.wx.qq.com/open/libs/weuijs/1.1.0/weui.min.js"></script>  
+    </head>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        body{
+            font-size: 14px;
+        }
+        html, body{
+                height: 100%;
+                background-color: #f8f8f8;
+            }
+            body{
+                font-family: -apple-system-font, Helvetica Neue, Helvetica, sans-serif;
+            }
+            .item{
+                padding: 10px 0;
+            }
+            .item__title{
+                margin-bottom: 5px;
+                padding-left: 15px;
+                padding-right: 15px;
+                color: #999;
+                font-weight: normal;
+                font-size: 14px;
+            }
+            .item__ctn{
+                padding: 0 15px;
+            }
+            .page_feedback{
+                padding: 15px;
+                overflow: auto;
+                background-color: #FFFFFF;
+            }
+            /*fix fastclick很难点中的bug*/
+            label > * { pointer-events: none; }
+
+            /* weui需要fix的 */
+            .weui-picker__item{
+                padding: 0;
+                height: 34px;
+                line-height: 34px;
+            }
+    </style>
+        <script>
+            document.documentElement.style.fontSize = document.documentElement.clientWidth / 7.5 * 2 + 'px';
+        </script>
+      <body>
+        <script>
+    weui.picker([
+        {
+            label: '广东',
+            value: 0,
+            children: [
+                {
+                    label: '广州',
+                    value: 0,
+                    children: [
+                        {
+                            label: 'A1',
+                            value: 0
+                        }, {
+                            label: 'B2',
+                            value: 1
+                        },                       
+                         {
+                            label: 'C3',
+                            value: 0
+                        }, {
+                            label: 'D4',
+                            value: 1
+                        },{
+                            label: 'E5',
+                            value: 1
+                        }
+                    ]
+                }
+            ]
+        }
+    ], {
+        depth: 3,
+        defaultValue: [0, 0, 0],
+        onChange: function (result) {
+            console.log(result);
+        },
+        onConfirm: function (result) {
+            console.log(result);
+        },
+        id: 'cascadePicker'
+    });
+        </script>
+      </body>
+    </html>
