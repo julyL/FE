@@ -34,7 +34,7 @@ p.prototype.resolve = function(resolveData) {
         this.state="resolve";
         //  取出tasklist队列第一个task执行
         //  如果task返回promise对象[A]，则将剩下未执行的tasklist作为[A]的执行队列
-        //  如果是同步代码,[A]会先执行，但是执行时的tasklist还未指定。解决办法:是外面嵌套一层setTimout,之前认为不能这么做，会打乱普通代码的执行顺序。但执行测试6,发现官方好像就是这么处理的
+        //  如果是同步代码,[A]会先执行，但是执行时的tasklist还未指定。解决办法:是外面嵌套一层setTimout,之前认为不能这么做，会打乱普通代码的执行顺序。但执行测试6,发现官方也是增加setTimeout
 
         var task=this.tasklist.shift(),
             returndata;
