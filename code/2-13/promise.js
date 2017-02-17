@@ -1,5 +1,6 @@
 /*
-  https://github.com/fsjohnhuang/iPromise/edit/master/theory/PromisesA/promise-6.0.0-browser.js  
+  代码地址：https://github.com/fsjohnhuang/iPromise/edit/master/theory/PromisesA/promise-6.0.0-browser.js  
+  博文地址：http://www.cnblogs.com/fsjohnhuang/p/4139172.html
 */
 ;(function(exports){
 	var asap = function(fn){
@@ -104,7 +105,7 @@
     }
     // 构造promise的链表逻辑结构
     function Handler(onFulfilled, onRejected, resolve, reject) {
-      this.onFulfilled = typeof onFulfilled === "function" ? onFulfilled : null;
+      this.onFulfilled = typeof onFulfilled === "function" ? onFulfilled : null;    
       this.onRejected = typeof onRejected === "function" ? onRejected : null;
       this.resolve = resolve;
       this.reject = reject;
