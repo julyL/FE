@@ -21,7 +21,7 @@
           /* 
           注意：这里利用了闭包特性，此处的handle并不是新Promise的handle函数，而是this.then所属promise的handle函数。
               因此handler将被添加到this.then所属promise的deffereds数组中。
-              而onFulfilled和onRejected自然成为了this.then所属promise的状态转换事件处理函数，
+              而onFulfilled和onRejected自然成为了this.then所属promise的状态转换事件处理函数，(this.then方法中的2个函数，会成为this的事件处理函数)
               而resolve和reject依旧是新promise实例的状态转换触发函数。
           */
           handle(handler);
@@ -35,7 +35,7 @@
         }
         // asap的作用为将入参的操作压入event loop队列中
         asap(function() {      
-          //  如果没有加setTimeout(fn,0)  则同步函数后面加then方法,会造成同步函数已经执行，但是同步函数的的deferred任务队列还未加入队列(任务队列是在then方法执行后加入的)
+          //  如果没有加setTimeout(fn,0) ,则会立刻执行 当前的任务队列deferred。但是当前的任务队列是在后续的then方法中push的,会造成执行队列为空
 
           /* 下面是简化后的实现方式，个人感觉会直观一些
           var cb = deferred[state ? 'onFulfilled' : 'onRejected'];
@@ -76,6 +76,8 @@
             if (typeof then === "function") {
               // 将控制权移交thenable和promise对象，由它们来设置当前pormise的状态和状态转换事件处理函数的实参
               doResolve(then.bind(newValue), resolve, reject);
+              // 如果then方法[A]一个new Promise[B], 则会将这个then方法[A]的resolve,reject方法传入。当[B]执行resolve时，会将这个then方法[A]的状态有pending => resolve.
+              // 注意: 这个resolve是[A]中的，执行这个resolve会将[A]中的state设置为true,会执行[A]中的finale方法,也就是执行[A]的deferred队列([A]后续then里面的函数)
               return;
             }
           }
