@@ -1,53 +1,65 @@
     import Vue from 'vue';
-
-    Vue.filter('number', {
-        read(val) {
-            return val;
-        },
-        write(val) {
-            if (val == '') {
-                return ''
-            };
-            if (/^\d+\.?\d?$/.test(val)) {
-                return val;
-            } else {
-                return 0;
-            }
+    Vue.filter('toFixed', (val, number) => { // 处理数字
+        if (isNaN(+val)) {
+            return 0;
         }
-    });
-    //正整数
-    Vue.filter('toFixed', (val, number) => {
         return (+val).toFixed(number || 0)
-    });
-    Vue.filter('float', {
-        read(val) {
-            return val;
-        },
-        write(val) {
-            if (val == '') {
-                return ''
-            };
-            if (/^\d{1}\d*\.?\d*$/.test(val)) {
-                return val;
-            } else {
-                return 0;
-            }
-        }
-    });
-    Vue.filter('getTime', (time) => {
-        let date = new Date(time * 1000);
-        return date.toString().match(/\d{2}:\d{2}:\d{2}/g)[0];
     });
 
     Vue.filter('formatTime', (time, sign) => {
-        var date = new Date(time * 1000),
-            year = date.getFullYear(),
-            month = date.getMonth() + 1,
-            day = date.getDate(),
-            mark = sign || "-";
-        return year + mark + month + mark + day;
+        var leftPad = function(val) {
+            return val < 10 ? '0' + val : val;
+        }
+        var formatTime = function(time, formatStr) {
+            //   yyyy-mm-dd HH:MM:SS   =>  2016-08-22 04:50:40
+            //   yyyy年mm月dd日 HH时MM分SS秒  =>  2016年8月22日 05时50分40秒
+            var date = new Date(time),
+                year = date.getFullYear(),
+                month = date.getMonth() + 1,
+                day = date.getDate(),
+                hour = date.getHours(),
+                minute = date.getMinutes(),
+                second = date.getSeconds();
+            var returnStr = formatStr;
+
+            var dateObj = {
+                yy: year,
+                y: String(year).slice(-2),
+                mm: leftPad(month),
+                m: month,
+                dd: leftPad(day),
+                d: day,
+                HH: leftPad(hour),
+                H: hour,
+                MM: leftPad(minute),
+                M: minute,
+                SS: leftPad(second),
+                S: second
+            }
+            var regObj = {
+                yy: /yyyy/,
+                y: /yy/,
+                mm: /mm/,
+                m: /m/,
+                dd: /dd/,
+                d: /d/,
+                HH: /HH/,
+                H: /H/,
+                MM: /MM/,
+                M: /M/,
+                SS: /SS/,
+                S: /S/
+            };
+            var j;
+            for (var i in regObj) {
+                returnStr = returnStr.replace(regObj[i], dateObj[i]);
+            }
+            return returnStr;
+        }
+        return formatTime(time,sign);
     });
-    Vue.filter('textoverflow', (val, num) => {
+
+    Vue.filter('textoverflow', (val, num) => { //限制字符串长度，添加...显示
         if (!val) {
             return;
         }

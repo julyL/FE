@@ -2,6 +2,8 @@ function isNumber(n){
     return n===+n;
 }
 
+
+
 function isArray(arr) {  
   return Object.prototype.toString.call(arr) === '[object Array]';   
 }
