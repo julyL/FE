@@ -107,8 +107,7 @@ each("Boolean Number String Function Array Date RegExp Object Error".split(" "),
 function type(obj) {
     if ( obj == null ) return obj + "";
     return typeof obj === "object" || typeof obj === "function" ?
-        class2type[ toString.call(obj) ] || "object" :
-        typeof obj;
+        class2type[ toString.call(obj) ] || "object" : typeof obj;
 }
 
 function isFunction(fn) {
@@ -132,15 +131,16 @@ function isPlainObject(obj) {
         return class2type.hasOwnProperty;
     }
     // 判断不是简单的对象 非 `DOM 节点`，`window`
-    if ( JSLite.type( obj ) !== "object" || obj.nodeType || JSLite.isWindow( obj ) ) return false;
-    if ( obj.constructor && !hasOwn.call( obj.constructor.prototype, "isPrototypeOf" ) ) return false;
+    if ( JSLite.type( obj ) !== "object" || obj.nodeType || JSLite.isWindow( obj ) ) return false;      
+
+    if ( obj.constructor && !hasOwn.call( obj.constructor.prototype, "isPrototypeOf" ) ) return false;   //  这里的过滤未知 ？
     // 如果是 `{}` 和 `new Object` 返回true
     return true;
 }
 
 function isJson(obj) {
     var isjson = typeof(obj) == "object" &&
-        toString.call(obj).toLowerCase() == "[object object]" && !obj.length;
+        toString.call(obj).toLowerCase() == "[object object]" && !obj.length;     //mistake   obj={}  obj.key=1; ==> isJson(obj)==true
     return isjson;
 }
 

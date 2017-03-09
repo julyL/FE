@@ -4,8 +4,7 @@
 	<meta charset="UTF-8">
 	<title>Document</title>
 </head>
-<!-- <script src="./jquery.js"></script> -->
-<script src="./myjq.js"></script>
+<!-- <script src="./jsLite.js"></script> -->
 <style>
 	
 *{
@@ -25,12 +24,30 @@
 }
 </style>
 <body>
-	<div class="a red red">11111</div>	
-	
-	<div class="b"></div>
+
+
 
 <script>
-	
+var request = new XMLHttpRequest();
+request.open('GET', 'http://api.yitianyishu.com/system/new-theme', true);
+
+request.onload = function() {
+  if (request.status >= 200 && request.status < 400) {
+    // Success!
+    var data = JSON.parse(request.responseText);
+    console.log(data)
+  } else {
+    // We reached our target server, but it returned an error
+
+  }
+};
+
+request.onerror = function() {
+  // There was a connection error of some sort
+};
+
+request.send();
+	     
 
 </script>
 </body>
