@@ -1,11 +1,4 @@
     import Vue from 'vue';
-    Vue.filter('toFixed', (val, number) => { // 处理数字
-        if (isNaN(+val)) {
-            return 0;
-        }
-        return (+val).toFixed(number || 0)
-    });
-
     Vue.filter('formatTime', (time, sign) => {
         var leftPad = function(val) {
             return val < 10 ? '0' + val : val;
@@ -56,7 +49,7 @@
             }
             return returnStr;
         }
-        return formatTime(time,sign);
+        return formatTime(time, sign);
     });
 
     Vue.filter('textoverflow', (val, num) => { //限制字符串长度，添加...显示
@@ -68,4 +61,17 @@
         } else {
             return val.slice(0, num).replace(/[.、。！？]$/, '') + "...";
         }
+    });
+
+    Vue.filter('toFixed', (val, number) => { // 处理数字
+        if (isNaN(+val)) {
+            return 0;
+        }
+        return (+val).toFixed(number || 0)
+    });   
+     Vue.filter('+toFixed', (val, number) => { // 处理数字
+        if (isNaN(+val)||(+val)<0) {
+            return 0;
+        }
+        return (+val).toFixed(number || 0)
     });
