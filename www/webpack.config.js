@@ -69,12 +69,14 @@ module.exports = {
     historyApiFallback: true,
     hot: true,
     noInfo: false,
-    // proxy: {
-    //   '/menu': {
-    //       target:"localhost:4001/api",
+    // proxy: [
+    //   {
+    //       context:['/menu','/system/carousel','/area'],
+    //       target:"http://fresh.hixiaoyuan.cn",
+    //       changeOrigin: true,
     //       secure: false
     //   }
-    // }
+    // ]
   },
   devtool: '#eval-source-map',
   resolve: {
