@@ -5,23 +5,15 @@ var ExtractTextPlugin = require('extract-text-webpack-plugin');
 module.exports = {
   entry: {
     //单页面开发的入口文件
-     // app:"./src/app.js",       
-
-     // 已下为多文件开发入口
-     page1:"./production/entry/page1.js",
-     page2:"./production/entry/page2.js",
+     app:"./src/app.js",       
   },
   output: {
     //单页配置
-    // path: path.resolve(__dirname, './src/dist/'),
+    path: path.resolve(__dirname, './src/dist/'),
     // publicPath: '/dist/',         //线上
-    // publicPath: '/src/dist/',        //本地测试
+    publicPath: '/src/dist/',        //本地测试
 
     // 多页配置
-    path: path.resolve(__dirname, './production/js/dist/'),        
-    // // publicPath: '/js/dist/',                                    //线上
-    publicPath: '/production/js/dist/',                            //本地测试   测试：/production/app.html    线上： /app.html    
-    filename: '[name].js',
   },
   resolveLoader: {
     root: path.join(__dirname, 'node_modules'),
