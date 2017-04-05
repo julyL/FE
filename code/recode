@@ -1,0 +1,57 @@
+To DO list:
+
+1.奇舞特训营文章阅读
+
+3.常用组件代码的研究编写(Mint-ui等)
+
+4.jQuery源码
+
+5.Webpack2配置的研究   
+
+6.Web安全     
+  {
+  	 xss,   (xss.pdf ,https://xss.haozi.me/#/0x03)
+  	 csrf，
+  	 dns挟持
+  	 http挟持
+  }
+
+7. 44道js题目解析
+
+8.移动端输入框 文章
+
+
+DO:
+
+Xff.pdf第一部分阅读
+	html中的属性会自动对实体字符转义<img src="1" onerror="alert%26%23x28;1%26%23x29;">
+	->  html编码?  宽字符?  unicode编码?   十六进制编码?  UTF－8编码?
+	坑太深,以后再跳
+
+
+DO:
+	44道js题目解析
+
+
+4-1:  
+  看jsLite.js的源码
+
+
+;function(root,factory){
+  
+}(this,function(JSLite){
+  
+})
+
+
+isJson  
+  !obj.length 没有必要
+
+
+  data(){
+    return{
+      user:""
+    }
+  }
+
+  4/5  $.Callback  3015-3177

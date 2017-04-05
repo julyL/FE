@@ -50,7 +50,7 @@ if(!Array.indexOf){
         return -1;
     }
 }
-//IE对forEach方法的支持
+//IE对forEach方法的支
 if (!Array.prototype.forEach) {
     Array.prototype.forEach = function(fun /*, thisp*/){
         var len = this.length;

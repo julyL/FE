@@ -5,7 +5,7 @@ var ExtractTextPlugin = require('extract-text-webpack-plugin');
 module.exports = {
   entry: {
     //单页面开发的入口文件
-     app:"./src/app.js",       
+     // app:"./src/app.js",       
   },
   output: {
     //单页配置

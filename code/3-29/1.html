@@ -1,0 +1,164 @@
+<html>
+<style>
+	.wrapper {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  overflow: scroll;
+}
+
+#list {
+  list-style-type: none;
+  justify-content: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+#list li {
+  padding: 10px;
+  margin: 0;
+}
+#list img {
+  height: 200px;
+  cursor: pointer;
+}
+
+#mask {
+  position: absolute;
+  left: 0;
+  top:  0; 
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.8);
+  display: none;
+  user-select: none;
+}
+
+#mask .previous,
+#mask .next{
+  width: 30px;
+  text-align: center;
+  color: white;
+  font-size: 2em;
+  top : 50%;
+  transform: translateY(-50%);
+  position: absolute;
+  text-decoration: none;
+}
+
+#mask .next{
+  right: 0;
+}
+#mask img{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  max-height: 90%;
+  max-width: 90%;
+}
+</style>
+<div class="wrapper">
+    <ul id="list">
+        <li>
+            <img src="https://p4.ssl.qhimg.com/t01713d89cfdb45cdf5.jpg">
+        </li>
+        <li>
+            <img src="https://p4.ssl.qhimg.com/t01e456146c8f8a639a.jpg">
+        </li>
+        <li>
+            <img src="https://p1.ssl.qhimg.com/t015f613e2205b573d8.jpg">
+        </li>
+        <li>
+            <img src="https://p0.ssl.qhimg.com/t01290338a28018d404.jpg">
+        </li>
+        <li>
+            <img src="https://p3.ssl.qhimg.com/t01d9aa5ae469c8862e.jpg">
+        </li>
+        <li>
+            <img src="https://p3.ssl.qhimg.com/t01cb20d35fc4aa3c0d.jpg">
+        </li>
+        <li>
+            <img src="https://p5.ssl.qhimg.com/t0110b30256941b9611.jpg">
+        </li>
+    </ul>
+</div>
+<div id="mask">
+    <a class="previous" href="###">&lt;</a>
+    <img id="preview-image" src="">
+    <a class="next" href="###">&gt;</a>
+</div>
+<script>
+	var imgList = document.getElementById('list');
+var imgs = document.querySelectorAll('ul img');
+
+function setPreviewBehavior(subjects){
+  var previewEvent = document.createEvent('Event');
+  previewEvent.initEvent('preview', true, true);
+  
+  if(!Array.isArray(subjects)){
+    if(subjects.length) subjects = Array.from(subjects);
+    else subjects = [subjects];
+  }
+  
+  previewEvent.previewTargets = subjects.map(function(evt){
+    return evt.src;
+  });
+  
+  subjects.forEach(function(subject){
+    subject.preview = function(){
+      subject.dispatchEvent(previewEvent);
+    }
+  });
+}
+
+setPreviewBehavior(imgs);
+
+var previewMask = document.getElementById('mask');
+var previewImage = previewMask.querySelector('img');
+var previewPrevious = previewMask.querySelector('.previous');
+var previewNext = previewMask.querySelector('.next');
+
+previewMask.onclick = function(evt){
+  if(evt.target === previewMask){
+    previewMask.style.display = 'none';
+  }
+}
+
+imgList.addEventListener('click', function(evt){
+  if(evt.target.preview){
+    evt.target.preview();
+  }
+});
+
+imgList.addEventListener('preview', function(evt){
+  var src = evt.target.src,
+      imgs = evt.previewTargets;
+  previewMask.style.display = 'block';
+  previewImage.src = src;
+  
+  var idx = imgs.indexOf(src);
+  
+  function updateButton(idx){
+    previewPrevious.style.display = idx ? 'block' : 'none';
+    previewNext.style.display = idx < imgs.length - 1 ? 'block' : 'none';
+  }
+  
+  updateButton(idx);
+  
+  previewPrevious.onclick = function(evt){
+    previewImage.src = imgs[--idx];
+    updateButton(idx);
+  }
+  
+  previewNext.onclick = function(evt){
+    previewImage.src = imgs[++idx];
+    updateButton(idx);
+  }
+});
+
+
+</script>
+
+</html>
