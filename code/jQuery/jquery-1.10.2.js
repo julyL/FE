@@ -3021,7 +3021,7 @@ jQuery.Callbacks = function( options ) {
 		jQuery.extend( {}, options );
 
 	var // Flag to know if list is currently firing
-		firing,      //  ?????? 
+		firing,      //  是否正在执行回调队列  
 		// Last fire value (for non-forgettable lists)
 		memory,
 		// Flag to know if list was already fired
@@ -3086,10 +3086,10 @@ jQuery.Callbacks = function( options ) {
 					// Do we need to add the callbacks to the
 					// current firing batch?
 					if ( firing ) {
-						firingLength = list.length;
+						firingLength = list.length;      //回调队列正在执行,又执行了add操作,需要更新firingLength
 					// With memory, if we're not firing then
 					// we should call right away
-					} else if ( memory ) {     	  //如果flag是 memory, 则add时马上触发新添加的回调
+					} else if ( memory ) {     	  //  如果flag是 memory, 则add时马上触发新添加的回调
 						firingStart = start;      //  记录还未添加到 回调队列的长度
 						fire( memory );
 					}
@@ -3105,10 +3105,10 @@ jQuery.Callbacks = function( options ) {
 							list.splice( index, 1 );
 							// Handle firing indexes
 							if ( firing ) {         
-								if ( index <= firingLength ) {
+								if ( index <= firingLength ) {    //  感觉这里的判断 多余了
 									firingLength--;
 								}
-								if ( index <= firingIndex ) {
+								if ( index <= firingIndex ) {     //  如果删除的位置  没有在当前执行队列的后面, 则当前执行的位置减1
 									firingIndex--;
 								}
 							}
