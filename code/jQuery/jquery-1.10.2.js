@@ -3021,7 +3021,7 @@ jQuery.Callbacks = function( options ) {
 		jQuery.extend( {}, options );
 
 	var // Flag to know if list is currently firing
-		firing,      //  ?????? 
+		firing,      //  
 		// Last fire value (for non-forgettable lists)
 		memory,
 		// Flag to know if list was already fired
@@ -3054,7 +3054,7 @@ jQuery.Callbacks = function( options ) {
 			if ( list ) {
 				if ( stack ) {
 					if ( stack.length ) {
-						fire( stack.shift() );
+						fire( stack.shift() );   //递归调用堆栈
 					}
 				} else if ( memory ) {
 					list = [];
@@ -3085,7 +3085,7 @@ jQuery.Callbacks = function( options ) {
 					})( arguments );
 					// Do we need to add the callbacks to the
 					// current firing batch?
-					if ( firing ) {
+					if ( firing ) {         //  如果执行回调队列中的函数又执行了add操作，那么需要更新firingLength的长度
 						firingLength = list.length;
 					// With memory, if we're not firing then
 					// we should call right away
@@ -3154,7 +3154,7 @@ jQuery.Callbacks = function( options ) {
 				if ( list && ( !fired || stack ) ) {
 					args = args || [];
 					args = [ context, args.slice ? args.slice() : args ];
-					if ( firing ) {
+					if ( firing ) {      // 如果回调队列正在执行,这时队列中的函数又执行了fire,则压入堆栈(args放入stack中)
 						stack.push( args );
 					} else {
 						fire( args );
