@@ -3021,7 +3021,11 @@ jQuery.Callbacks = function( options ) {
 		jQuery.extend( {}, options );
 
 	var // Flag to know if list is currently firing
+<<<<<<< HEAD
 		firing,      //  
+=======
+		firing,      //  是否正在执行回调队列  
+>>>>>>> 90b2e549ef98ee5b3a1286161a444fdadf4ab719
 		// Last fire value (for non-forgettable lists)
 		memory,
 		// Flag to know if list was already fired
@@ -3085,11 +3089,16 @@ jQuery.Callbacks = function( options ) {
 					})( arguments );
 					// Do we need to add the callbacks to the
 					// current firing batch?
+<<<<<<< HEAD
 					if ( firing ) {         //  如果执行回调队列中的函数又执行了add操作，那么需要更新firingLength的长度
 						firingLength = list.length;
+=======
+					if ( firing ) {
+						firingLength = list.length;      //回调队列正在执行,又执行了add操作,需要更新firingLength
+>>>>>>> 90b2e549ef98ee5b3a1286161a444fdadf4ab719
 					// With memory, if we're not firing then
 					// we should call right away
-					} else if ( memory ) {     	  //如果flag是 memory, 则add时马上触发新添加的回调
+					} else if ( memory ) {     	  //  如果flag是 memory, 则add时马上触发新添加的回调
 						firingStart = start;      //  记录还未添加到 回调队列的长度
 						fire( memory );
 					}
@@ -3105,10 +3114,10 @@ jQuery.Callbacks = function( options ) {
 							list.splice( index, 1 );
 							// Handle firing indexes
 							if ( firing ) {         
-								if ( index <= firingLength ) {
+								if ( index <= firingLength ) {    //  感觉这里的判断 多余了
 									firingLength--;
 								}
-								if ( index <= firingIndex ) {
+								if ( index <= firingIndex ) {     //  如果删除的位置  没有在当前执行队列的后面, 则当前执行的位置减1
 									firingIndex--;
 								}
 							}
@@ -7777,7 +7786,7 @@ jQuery.each( [ "ajaxStart", "ajaxStop", "ajaxComplete", "ajaxError", "ajaxSucces
 		return this.on( type, fn );
 	};
 });
-
+// li start
 jQuery.extend({
 
 	// Counter for holding the number of active queries

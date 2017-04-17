@@ -915,11 +915,12 @@ window.JSLite = window.$ = JSLite;
     });
     /* 绑定事件 end */
 })(JSLite);
+//li start
 ;(function($){
     var jsonpID = 0
-    function parseArguments(url, data, success, dataType){
+    function parseArguments(url, data, success, dataType){     // ajax有些参数是否传入没有限制, 需要处理来得到一致的输出 
         $.isFunction(data) && (dataType = success, success = data, data = undefined),   //  (url,fn,dataType)
-        $.isFunction(success) || (dataType = success, success = undefined)
+        $.isFunction(success) || (dataType = success, success = undefined)         //  (url,data,dataType)
         return {
             url: url, 
             data: data, 
@@ -928,7 +929,7 @@ window.JSLite = window.$ = JSLite;
         }
     }
     $.extend({
-        ajaxSettings:{
+        ajaxSettings:{     //默认的ajax设置
             // 默认请求类型
             type:'GET',
             // 如果请求成功时执行回调
@@ -938,7 +939,7 @@ window.JSLite = window.$ = JSLite;
             xhr:function () {
               return new window.XMLHttpRequest();
             },
-            processData:true,
+            processData:true,      //对于非Get请求。是否自动将 data 转换为字符串
             complete:function(){},//要求执行回调完整（包括：错误和成功）
             // MIME类型的映射
             accepts:{
@@ -951,7 +952,7 @@ window.JSLite = window.$ = JSLite;
             // 应该被允许缓存GET响应
             cache: true
         },
-        param:function(obj,traditional,scope){
+        param:function(obj,traditional,scope){    //将表单元素数组或者对象序列化
             if($.type(obj) == "string") return obj;
             var params = [],str='';
             params.add=function(key, value){
@@ -990,11 +991,11 @@ window.JSLite = window.$ = JSLite;
         getJSON:function(/* url, data, success */){
             var options = parseArguments.apply(null, arguments),
                 url = arguments[0];
-            if(url&&url == document.location.host) options.dataType = 'json';
+            if(url&&url == document.location.host) options.dataType = 'json';     // 
             else options.dataType = 'jsonp';
             return this.ajax(options);
         },
-        ajaxJSONP:function (options) {
+        ajaxJSONP:function (options) {      //已过时，使用 $.ajax 代替
             var _callbackName = options.jsonpCallback,
             callbackName = ($.isFunction(_callbackName) ? _callbackName() : _callbackName) || ('jsonp' + (++jsonpID)),
             script = document.createElement('script'),
@@ -1026,20 +1027,28 @@ window.JSLite = window.$ = JSLite;
                 appendQuery = function(url, query) {
                     if (query == '') return url
                     return (url + '&' + query).replace(/[&?]{1,2}/, '?')
+                    /*
+                        url可能的情况                                 处理情况
+                        a.com        ->      a.com&query                 √
+                        a.com?       ->      a.com?&query                √
+                        a.com?b=     ->      a.com?b=&query              √
+                        a.com?b=1    ->      a.com?b=1&query             √
+                        a.com?b=1&   ->      a.com?b=1&&query            ×
+                     */
                 },
-                serializeData = function(options){
+                serializeData = function(options){     //  data的处理
                     if (options.processData && options.data && $.type(options.data) != "string")
                         options.data = $.param(options.data, options.traditional)
                     if (options.data && (!options.type || options.type.toUpperCase() == 'GET'))
                         options.url = appendQuery(options.url, options.data), options.data = undefined
                 };
                 options = options || {};
-                if ($.isString(options)) {           // 第一个参数为 get或post的处理
+                if ($.isString(options)) {           //主要是对传参是非object对象的处理   例如: $.ajax('get',) $.ajax("post",)这种方式的传参 都会调用parseArguments方法使得option最终变成Object对象 
                     if (arguments[0]=="GET") {
                         var  urls=arguments[1];
-                        if (arguments[2]&&$.isFunction(arguments[2])) {
+                        if (arguments[2]&&$.isFunction(arguments[2])) {       //$.ajax("get",fn)
                             $.get(urls,arguments[2])    
-                        }else if(arguments[2]&&$.isJson(arguments[2])){
+                        }else if(arguments[2]&&$.isJson(arguments[2])){       //  $.ajax("get",data,fn)
                             $.get(urls.indexOf('?')>-1?urls+'&'+this.param(arguments[2]):urls+'?'+this.param(arguments[2]),arguments[3])
                         };
                     }else if(arguments[0]=="POST"){
@@ -1047,10 +1056,12 @@ window.JSLite = window.$ = JSLite;
                     };
                     return;
                 };
+                //执行到下面,options一定是Object对象
+                
                 settings=$.extend({}, options || {});
                 for (key in $.ajaxSettings) if (settings[key] === undefined) settings[key] = $.ajaxSettings[key];   //没有设置就采用 ajaxSettings的默认设置
                 //{ type, url, data, success, dataType, contentType }
-            serializeData(settings)
+            serializeData(settings)   // option.data的处理   get就加到url后面,post方法就根据processData来决定是否序列化
 
             //jsonp
             var dataType = settings.dataType, hasPlaceholder = /\?.+=\?/.test(settings.url)
@@ -1065,6 +1076,7 @@ window.JSLite = window.$ = JSLite;
             //判断是否为jsonp
             if ('jsonp' == dataType) {
                 if (!hasPlaceholder) settings.url = appendQuery(settings.url,settings.jsonp ? (settings.jsonp + '=?') : settings.jsonp === false ? '' : 'callback=?')
+                //   没有设置jsonp,就默认采用 callback=?
                 return $.ajaxJSONP(settings)
             }
 
@@ -1086,7 +1098,7 @@ window.JSLite = window.$ = JSLite;
                         var result, error = false;
                             result = xhr.responseText
                         try {
-                            if (settings.dataType == 'script')    (1,eval)(result)
+                            if (settings.dataType == 'script')    (1,eval)(result)   //   在全局作用域中执行result (1,eval)('console.log(this)') => window
                             else if (settings.dataType == 'xml')  result = xhr.responseXML
                             else if (settings.dataType == 'json') result = /^\s*$/.test(result) ? null : JSON.parse(result)
                         } catch (e) { error = e }
