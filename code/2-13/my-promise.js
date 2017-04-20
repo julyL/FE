@@ -17,17 +17,17 @@
         if (!isFunction(fn) || this instanceof Promise == false) {
             throw new TypeError("Promise必须传入function并且new构造")
         }
-        this.state = 'pending';
-        this.value = undefined;
-        this.resolveQueue = [];
-        this.rejectQueue = [];
-        this.thenPromise = undefined;
+        this.status = 'pending';
+        this.value = undefined;         //  promise状态改变之后传递的值
+        this.resolveQueue = [];         //
+        this.rejectQueue = [];          //   
+        this.thenPromise = undefined;   //执行then之后返回的promise
         var re = asyncExcute(function(resolveData) { this._resolve(resolveData) }.bind(this)), //这里必须异步处理,否则then函数执行以前可能就已经执行了re
             rj = asyncExcute(function(resolveData) { this._reject(resolveData) }.bind(this));
         try {
             fn(re, rj)
         } catch (error) {
-            this.state = 'reject';
+            this.status = 'reject';
             this.value = error;
         }
     }
@@ -36,12 +36,17 @@
         this.thenPromise = returnPro;
         this.resolveQueue.push(refn);
         this.rejectQueue.push(rjfn);
+        if(this.status=='resolve'){
+           this._resolve(this.value);
+        }        
+        if(this.status=='reject'){
+           this._reject(this.value);
+        }
         return returnPro;
     }
     Promise.prototype._resolve = function(resolveData) {
         var handle,
             returnVal;
-        if (this.status != "resolve" && this.status != "reject") { //在 promise 执行结束前其不可被调用
             this.status = "resolve";
             this.value = resolveData;
             while (this.resolveQueue.length > 0) { //2.2.6  当 promise 成功执行时，所有 onFulfilled 需按照其注册顺序依次回调
@@ -90,7 +95,6 @@
                 }
 
             }
-        }
     }
     Promise.prototype._reject = function(resolveData) {
         var handle,
