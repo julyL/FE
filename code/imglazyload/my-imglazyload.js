@@ -45,37 +45,46 @@
         };
     }
 
-    function requestAnimationFrame(fn) {
-        return window.requestAnimationFrame1 || function() {
-            var context = this,
-                args = arguments;
-            return setTimeout(function() {
-                fn.call(context, args);
-            }, 16)
-        }
+    var requestAnimationFrame = window.requestAnimationFrame1 || function(fn) {
+        var context = this,
+            args = arguments;
+        return setTimeout(function() {
+            fn.call(context, args);
+        }, 16)
     }
 
-    function cancelAnimationFrame(timer) {
-        return window.cancelAnimationFrame1 || function() {
-            clearTimeout(timer);
-        }
+    var cancelAnimationFrame = window.cancelAnimationFrame1 || function(timer) {
+        clearTimeout(timer);
     }
 
-    function animation(dom, startCss,endCss,time) {
-        // if(isSupportCss3()){
+    function isSupportCss3() {
+        return document.body.style.transition != undefined || document.body.style.WebkitTransition != undefined;
+    }
 
-        // }
-        // 
-        Object.keys(startCss).forEach(function(val,index){
-            dom.style[val]=startCss[val];
-            var timer=requestAnimationFrame((function(){
-                var add=(endCss[val]-startCss[val])/(time/16);
-                console.log(add);
-                if(dom.style[val]+add<endCss[val]){
-                    dom.style[val]=dom.style[val]+add;
+    function animation(dom, startCss, endCss, time) {
+        if (isSupportCss3()) {
+            Object.keys(startCss).forEach(function(val, index) {
+                dom.style.transition = 'none';
+                dom.style[val] = startCss[val];
+            });
+            Object.keys(startCss).forEach(function(val, index) {
+                dom.style.transition = "all " + time / 1000 + "s";
+                // setTimeout(function() {
+                    // dom.style[val] = endCss[val];
+                // }, 1000);
+            });
+            return;
+        }
+        Object.keys(startCss).forEach(function(val, index) {
+            dom.style[val] = startCss[val];
+            var timer = requestAnimationFrame((function() {
+                // debugger;
+                var add = (endCss[val] - startCss[val]) / (time / 16);
+                if (parseFloat(dom.style[val]) + add < endCss[val]) {
+                    dom.style[val] = parseFloat(dom.style[val]) + add;
                     requestAnimationFrame(arguments.callee);
-                }else{
-                    dom.style[val]=endCss[val];
+                } else {
+                    dom.style[val] = endCss[val];
                     cancelAnimationFrame(timer);
                 }
             }))
@@ -95,8 +104,8 @@
         this.container = config.container || querySe("body");
         this.imgAttribute = config.imgAttribute || "data-original";
         this.distance = config.distance || 0;
-        this.placeholderImg = config.placeholderImg || "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC"; //占位图片
-        this.errorImg = config.errorImg || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"; //加载失败的图片
+        this.placeholderImg = config.placeholderImg || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"; //占位图片
+        this.errorImg = config.errorImg || "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC"; //加载失败的图片
         this.loadingAction = config.loadingAction || "default"; // 默认是图片距离视图distance时就加载图片  
         this.showAnimation = config.showAnimation == "none" ? "none" : "fade";
 
@@ -127,11 +136,12 @@
                         img.removeAttribute(self.imgAttribute);
                         img.setAttribute("data-imglazy", "lazyed");
                         if (self.showAnimation == 'fade') {
+                            img.style.opacity = .3;
                             animation(img, {
                                 opacity: .3
                             }, {
                                 opacity: 1
-                            }, 3000);
+                            }, 5000);
                         }
 
                     };
@@ -161,17 +171,6 @@
         }
     }
 
-    // imgLazyload.prototype.init = function() {
-    //     loadimgs = this.container.querySelectorAll("img[" + this.imgAttribute + "]");
-    //     loadimgsArr = [].slice.call(loadimgs);
 
-    //     loadimgsArr.forEach(function(img, index) {
-    //         if (isInview(img)) {
-    //             img.src = img.getAttribute(self.imgAttribute);
-    //             img.removeAttribute(self.imgAttribute);
-    //         }
-    //     });
-    // }
-    // 
     window.imgLazyload = imgLazyload;
 })();
