@@ -8,34 +8,56 @@
     <link rel="stylesheet" href="">
 </head>
 <style>
+html,body{
+    height: 100%;
+    overflow: hidden;
+}
+/* .ww {
+    height: 6000px;
+} */
+
 img {
     width: 400px;
     height: 400px;
     display: block;
     margin: 50px;
 }
-.w{
-	background: #ccc;
-	overflow: auto;
-	margin: 100px;
-	height: 600px;
+
+.w {
+    /* background: #ccc; */
+    overflow: auto;
+    margin: 100px;
+    height: 1600px;
 }
+
+img[data-imglazy='lazying'] {}
+
+img[data-imglazy='lazyed'] {}
 </style>
-<div class="w">
-<img data-v-b7940aee="" alt="" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/14188990-file_1490167773416_63d3.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80" lazy="loaded">
-<img data-v-b7940aee="" alt="" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/14041421-file_1490167492833_5532.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80" lazy="loaded">
-<img data-v-b7940aee="" alt="" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/37397357-file_1490165885255_505c.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80" lazy="loaded">
-<img data-v-b7940aee="" alt="" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/89675163-file_1490164463492_7c90.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80" lazy="loaded">
-<img data-v-b7940aee="" alt="" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/69249046-file_1490167026695_861c.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80" lazy="loaded">
-<img data-v-b7940aee="" alt="" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/2306671-file_1490166472947_bfca.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80" lazy="loaded">
-<img data-v-b7940aee="" alt="" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/86793696-file_1490165360770_133fe.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80" lazy="loaded">
-<img data-v-b7940aee="" alt="" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/35764853-file_1490164906253_16c54.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80" lazy="loaded">
-<img data-v-b7940aee="" alt="" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/18135405-file_1490163328257_3899.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80" lazy="loaded">
-<img data-v-b7940aee="" alt="" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/31314455-file_1490162920034_fe1a.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80" lazy="loaded">
-<img data-v-b7940aee="" alt="" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/56871724-file_1490162253115_172aa.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80" lazy="loaded">
-<img data-v-b7940aee="" alt="" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/7821053-file_1490161601119_a425.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80" lazy="loaded">
+<div class="ww">
+    <div class="w">
+        <img data-v-b7940aee="" alt="" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/14188990-file_1490167773416_63d3.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
+        <img data-v-b7940aee="" alt="" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/14041421-file_1490167492833_5532.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
+        <img data-v-b7940aee="" alt="" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/37397357-file_1490165885255_505c.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
+        <img data-v-b7940aee="" alt="" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/89675163-file_1490164463492_7c90.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
+        <img data-v-b7940aee="" alt="" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/69249046-file_1490167026695_861c.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
+        <img data-v-b7940aee="" alt="" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/2306671-file_1490166472947_bfca.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
+        <img data-v-b7940aee="" alt="" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/86793696-file_1490165360770_133fe.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
+        <img data-v-b7940aee="" alt="" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/35764853-file_1490164906253_16c54.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
+        <img data-v-b7940aee="" alt="" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/18135405-file_1490163328257_3899.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
+        <img data-v-b7940aee="" alt="" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/31314455-file_1490162920034_fe1a.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
+        <img data-v-b7940aee="" alt="" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/56871724-file_1490162253115_172aa.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
+        <img data-v-b7940aee="" alt="" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/7821053-file_1490161601119_a425.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
+    </div>
 </div>
+
 <body>
-<script src="./my-imglazyload.js"></script>
+    <script src="./my-imglazyload.js"></script>
+    <script>
+    imgLazyload({
+        container: document.querySelector('.w')
+    });
+    </script>
 </body>
+
 </html>
