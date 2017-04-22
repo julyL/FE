@@ -29,10 +29,15 @@ img {
     margin: 100px;
     height: 1600px;
 }
-
-img[data-imglazy='lazying'] {}
-
-img[data-imglazy='lazyed'] {}
+img[data-imglazy]{
+     transition: all 1s;
+}
+img[data-imglazy='lazying'] {
+    opacity: 0;
+}
+img[data-imglazy='lazyed'] {
+    opacity: 1;
+}
 </style>
 <div class="ww">
     <div class="w">
@@ -55,7 +60,9 @@ img[data-imglazy='lazyed'] {}
     <script src="./my-imglazyload.js"></script>
     <script>
     imgLazyload({
-        container: document.querySelector('.w')
+        container: document.querySelector('.w'),
+        // showAnimation:"none"
+
     });
     </script>
 </body>
