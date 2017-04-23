@@ -77,7 +77,7 @@
                 Object.keys(startCss).forEach(function(val, index) {
                     dom.style[val] = endCss[val];
                 });
-            }, 30); // 这里设置的时间过小时(例如10),当time设置一个较大的值(例如5000)  会出现部分img的渐入效果失效 why??
+            }, 30); // 这里设置的时间过小(例如10),并且参数time设置一个较大的值(例如5000)  会出现部分img的渐入效果失效(直接显示了) why??
             return;
         }
 
@@ -99,6 +99,19 @@
         });
     }
 
+    function Queue() {
+        this._queue = [];
+        this.q = [];
+    }
+
+    Queue.prototype.push = function(fn) { //入栈
+        this._queue.push(fn);
+    }
+    Queue.prototype.next = function() { // 执行
+        console.log(this._queue.length);
+        var fn = this._queue.shift();
+        fn && fn();
+    }
     var imgLazyload = function(config) {
         var container, // 容器
             containerPosition, // 容器的位置信息
@@ -106,7 +119,9 @@
             loadimgs, // 需要处理的图片dom集合
             loadimgsArr, // 将loadimgs转换为数组
             self = this,
+            queue = new Queue(), // 一个图片加载队列
             i;
+         window.Queue=queue;
         config = config || {};
         this.container = config.container || querySe("body");
         this.imgAttribute = config.imgAttribute || "data-original";
@@ -117,12 +132,13 @@
         this.loadingAction = config.loadingAction || "default"; // 默认是图片距离视图distance时就加载图片  
         this.showAnimation = config.showAnimation == "none" ? "none" : "fade";
 
+
         container = this.container;
         containerPosition = offset(container);
 
-        function foreachImg(fn) { // 循环操作图片
-            var context = this;
-            loadimgs = this.container.querySelectorAll("img[" + this.imgAttribute + "]");
+        function foreachImg(fn) { // 循环操作符图片(还没有执行onload和onerror的图片)
+            var context = self;
+            loadimgs = self.container.querySelectorAll("img[" + self.imgAttribute + "]");
             loadimgsArr = [].slice.call(loadimgs);
 
             loadimgsArr.forEach(function(img, index) {
@@ -132,53 +148,69 @@
 
         function isInview(img) { // 判断图片是在可视区域
             var imgPosition = offset(img);
-            if (imgPosition.top -self.distance < window.innerHeight) {
+            if (imgPosition.top - self.distance < window.innerHeight) {
                 return true;
             }
             return false;
         }
-        handler = throttle(function() {
+        handler = function() {
             foreachImg(function(img, index) {
                 if (isInview(img)) {
-                    var image = new Image(),
-                        originUrl = img.getAttribute(self.imgAttribute);
-                    if ((img.src == originUrl || img.src == self.errorImg) && originUrl != self.errorImg) {
-                        //为true时说明图片已经加载过(onload和error中的事件已经执行过了),并且排除placeholderImg和errorImg设置成一样的问题
+                    var originUrl = img.getAttribute(self.imgAttribute);
+                    if (img.loadstatus) {
+                        // 只要设置过img.loadstatus就表示 已经给img对应的image绑定过了onload和onerror事件 (对【网速特别慢的情况下,滚动时已经绑定了事件的image会重复绑定事件的情况】进行优化)
                         return;
                     }
-                    image.onload = function() {
-                        if (!img.getAttribute(self.imgAttribute)) { //防止onload事件多次执行
-                            return;
+                    img.loadstatus = 'pending';
+                    queue.push((function(img, originUrl) {
+                        var image = new Image();
+                        return function() {
+                            image.onload = function() {
+                                img.src = originUrl;
+                                img.removeAttribute(self.imgAttribute);
+                                img.setAttribute("data-imglazy", "lazyed");
+                                img.loadstatus = 'resolve';
+                                if (self.showAnimation == 'fade') { //默认动画fade
+                                    animation(img, {
+                                        opacity: 0
+                                    }, {
+                                        opacity: 1
+                                    }, 1000);
+                                }
+                                self.ordinal && queue.next();
+                            };
+                            image.onerror = function() {
+                                img.src = self.errorImg;
+                                img.removeAttribute(self.imgAttribute);
+                                img.setAttribute("data-imglazy", "lazyed");
+                                img.loadstatus = 'reject';
+                                self.ordinal && queue.next();
+                            }
+                            image.src = originUrl;
                         }
-                        img.src = originUrl;
-                        img.removeAttribute(self.imgAttribute);
-                        img.setAttribute("data-imglazy", "lazyed");
-                        if (self.showAnimation == 'fade') { //默认动画fade
-                            animation(img, {
-                                opacity: 0
-                            }, {
-                                opacity: 1
-                            }, 1000);
-                        }
-                    };
-                    image.error = function() {
-                        img.src = self.errorImg;
-                        img.removeAttribute(self.imgAttribute);
-                        img.setAttribute("data-imglazy", "lazyed");
-                    }
-                    image.src = originUrl;
+                    })(img, originUrl));
                 }
             });
-        }, 100);
+        };
 
         // 初始化的一些设置
         foreachImg(function(img) {
-            img.src = this.placeholderImg;
+            img.src = self.placeholderImg;
             img.style.transformStyle = "preserve-3d";
             img.style.backfaceVisibility = "hidden";
             img.setAttribute("data-imglazy", "lazying");
-        })
+        });
+
         handler();
+
+        //  初始化队列
+        if (this.ordinal) {
+            queue.next(); //如果是按顺序的执行next
+        } else {
+            queue._queue.forEach(function(fn) {
+                fn && fn();
+            });
+        }
 
         var scrolldom;
         if (loadimgs.length == 0) {
@@ -187,7 +219,7 @@
         scrolldom = loadimgs[0].parentElement;
         while (scrolldom.nodeName.toLocaleLowerCase() != "html") { //  需要判断所有需要懒加载的图片的父级,如果父级可滚动，并且发生滚动时就应该判断是否应该加载图片
             if (window.getComputedStyle(scrolldom, null).overflow != 'hidden') {
-                scrolldom.addEventListener("scroll", handler, false);
+                scrolldom.addEventListener("scroll", throttle(handler), false);
             }
             scrolldom = scrolldom.parentElement;
         }
