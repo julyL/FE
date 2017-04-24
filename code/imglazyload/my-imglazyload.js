@@ -103,16 +103,21 @@
         this._queue = [];
         this.waitforExcuteNumber = 0;   
         // 每次scroll触发handle时，都会向队列中push相应的函数   waitforExcuteNumber表示上次handle中添加到队列中的函数还有多少没有执行
-
+        this.lock=false;
     }
 
     Queue.prototype.push = function(fn) { //入栈
         this._queue.push(fn);
     }
     Queue.prototype.next = function() { // 执行
+        if(this.lock){
+            return;
+        }
         var fn = this._queue.shift();
-        this.waitforExcuteNumber--;
-        fn && fn();
+        if(fn){
+            this.lock=true;
+            fn();
+        }
     }
     var imgLazyload = function(config) {
         var container, // 容器
@@ -165,6 +170,7 @@
                     // console.log("queue push: ", img.getAttribute('data-num'));
                     var image = new Image();
                     image.onload = function() {
+                        console.log("       onload: ",img.getAttribute("data-num"))
                         img.src = originUrl;
                         img.removeAttribute(self.imgAttribute);
                         img.setAttribute("data-imglazy", "lazyed");
@@ -176,6 +182,7 @@
                                 opacity: 1
                             }, 1000);
                         }
+                        queue.lock=false;
                         self.ordinal && queue.next();
                     };
                     image.onerror = function() {
@@ -183,11 +190,13 @@
                         img.removeAttribute(self.imgAttribute);
                         img.setAttribute("data-imglazy", "lazyed");
                         img.loadstatus = 'reject';
+                        queue.lock=false;
                         self.ordinal && queue.next();
                     }
+                    // debugger;
                     queue.push((function(image, originUrl, img) {
                         return function() {
-                            // console.log("loading ", img.getAttribute('data-num'));
+                            console.log("loading ", img.getAttribute('data-num'));
                             image.src = originUrl;
                         }
                     })(image, originUrl,img));
@@ -221,7 +230,7 @@
         scrolldom = loadimgs[0].parentElement;
         while (scrolldom.nodeName.toLocaleLowerCase() != "html") { //  需要判断所有需要懒加载的图片的父级,如果父级可滚动，并且发生滚动时就应该判断是否应该加载图片
             if (window.getComputedStyle(scrolldom, null).overflow != 'hidden') {
-                scrolldom.addEventListener("scroll", throttle(handler), false);
+                scrolldom.addEventListener("scroll",throttle(handler,100), false);
             }
             scrolldom = scrolldom.parentElement;
         }
