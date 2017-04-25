@@ -31,4 +31,4 @@ img[data-imglazy='lazyed'] {
 
 注：上面出现的视口为 文档可见区域的大小  (distance会影响视口)
 
-> lazy-img-load.js是别人写的,放在这里只是方便学习 :)
+> orthersWrite/ 目录下是别人写的图片懒加载,放在这里只是方便学习 :)

@@ -1,12 +1,12 @@
 /*
-	localStorage的封装库
-	@author julyL
-	@date  2016/11/12
+    localStorage的封装库
+    @author julyL
+    @date  2016/11/12
 
-	store.result("a.b.c",obj)   支持路径赋值(不存在的路径或者无法赋值的会默认创建{}空对象)   
-	eg:  Storage {a: "{"b":11}",length: 1}     =>   Storage {a: "{"b":{"c":22}}", length: 1}    因为a.b是数字无法添加属性,会用{}空对象代替a.b
+    store.result("a.b.c",obj)   支持路径赋值(不存在的路径或者无法赋值的会默认创建{}空对象)   
+    eg:  Storage {a: "{"b":11}",length: 1}     =>   Storage {a: "{"b":{"c":22}}", length: 1}    因为a.b是数字无法添加属性,会用{}空对象代替a.b
 */
-(function() {
+
     var _set = function(key, val) {
         if (typeof val === 'object') {
             localStorage[key] = JSON.stringify(val);
@@ -69,7 +69,7 @@
         if (val === undefined) {
             return len > 1 ? _result(key) : _get(key);
         }
-        if (key && val) {
+        if (key!==undefined && val!==undefined) {
             return len > 1 ? _result(key, val) : _set(key, val);
         }
     }
@@ -79,5 +79,5 @@
     store.clear = _clear;
     store.result = _result;
 
-    this.store = store;
-}.call(this));
+   export default store;
+
