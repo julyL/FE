@@ -2,6 +2,7 @@
 ### 原生js实现的图片懒加载  my-imglazyload.js (持续完善中，欢迎反馈)
 
 
+
 | 属性值 | 说明  | 可选值 |   
 | :---------|:------------| -----|
 | container     | 需要懒加载图片的父级(DOM),当document中有多处需要懒加载的地方,用于限定范围 | 默认：document.body |
@@ -28,7 +29,12 @@ img[data-imglazy='lazyed'] {
 }
 
 ```
+#### 效果演示
 
-注：上面出现的视口为 文档可见区域的大小  (distance会影响视口)
+访问示例:  
+[https://julyl.github.io/Code/code/imglazyload](https://julyl.github.io/Code/code/imglazyload)  (切换到手机模式)
+
+[![](http://qr.api.cli.im/qr?data=https%253A%252F%252Fjulyl.github.io%252FCode%252Fcode%252Fimglazyload%252F&level=H&transparent=false&bgcolor=%23ffffff&forecolor=%23000000&blockpixel=12&marginblock=1&logourl=&size=280&kid=cliim&key=43a4e9cf9dee90ba7d69952f67a1a6c0)](https://julyl.github.io/Code/code/imglazyload)
+
 
 > orthersWrite/ 目录下是别人写的图片懒加载,放在这里只是方便学习 :)
