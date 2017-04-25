@@ -1,5 +1,5 @@
 //别人的写的原生：  https://github.com/lzxb/lazy-load-img/edit/master/dist/lazy-load-img.js
-//  https://github.com/tuupola/jquery_lazyload/blob/master/jquery.lazyload.js
+
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :

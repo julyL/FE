@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>图片懒加载demo</title>
     <link rel="stylesheet" href="">
 </head>
 <style>
@@ -15,24 +15,29 @@ body {
 }
 
 
-/* .ww {
-    height: 6000px;
-} */
+.ww {
+    height: 100%;
+    overflow: auto;
+}
 
 img {
-    width: 400px;
-    height: 400px;
+    width: 200px;
+    height: 200px;
     display: block;
-    margin: 50px;
+    margin: 20px;
 }
 
 .w {
     /* background: #ccc; */
     overflow: auto;
-    margin: 100px;
-    height: 1600px;
+    margin: 20px;
 }
-
+#add{
+    position: fixed;
+    bottom: 100px;
+    right: 14px;
+    width: 100px;
+}
 img[data-imglazy] {
     transition: all 1s;
 }
@@ -47,37 +52,48 @@ img[data-imglazy='lazyed'] {
 </style>
 <div class="ww">
     <div class="w">
-        <img data-v-b7940aee="" data-num="1" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/14188990-file_1490167773416_63d3.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
-        <img data-v-b7940aee="" data-num="2" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/14041421-file_1490167492833_5532.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
-        <img data-v-b7940aee="" data-num="3" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/37397357-file_1490165885255_505c.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
-        <img data-v-b7940aee="" data-num="4" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/89675163-file_1490164463492_7c90.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
-        <img data-v-b7940aee="" data-num="5" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/69249046-file_1490167026695_861c.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
-        <img data-v-b7940aee="" data-num="6" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/2306671-file_1490166472947_bfca.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
-        <img data-v-b7940aee="" data-num="7" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/86793696-file_1490165360770_133fe.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
-        <img data-v-b7940aee="" data-num="8" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/35764853-file_1490164906253_16c54.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
-        <img data-v-b7940aee="" data-num="9" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/18135405-file_1490163328257_3899.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
-        <img data-v-b7940aee="" data-num="10" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/31314455-file_1490162920034_fe1a.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
-        <img data-v-b7940aee="" data-num="11" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/56871724-file_1490162253115_172aa.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
-        <img data-v-b7940aee="" data-num="12" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/7821053-file_1490161601119_a425.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
-        <img data-v-b7940aee="" data-num="13" data-original="http://pic1.win4000.com/wallpaper/7/5826e67d07567.jpg">
-        <img data-v-b7940aee="" data-num="14" data-original="http://img5.duitang.com/uploads/item/201204/10/20120410091024_ukViH.jpeg">
-        <img data-v-b7940aee="" data-num="15" data-original="http://img2.niutuku.com/desk/1208/1422/ntk-1422-17658.jpg">
-        <img data-v-b7940aee="" data-num="16" data-original="http://www.dingniu8.com/desk/UploadPic/2013-1/201311220560622.jpg">
-        <img data-v-b7940aee="" data-num="17" data-original="http://h6.86.cc/walls/20150508/1024x768_03bfc4e71a6f938.jpg">
-        <img data-v-b7940aee="" data-num="18" data-original="http://img.bizhi.sogou.com/images/2012/05/3/8783.jpg">
-        <img data-v-b7940aee="" data-num="19" data-original="http://pic1.win4000.com/wallpaper/8/570f378debe36.jpg">
-        <img data-v-b7940aee="" data-num="20" data-original="http://img4.imgtn.bdimg.com/it/u=382041659,3585629925&fm=21&gp=0.jpg">
+        <img  data-num="1" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/14188990-file_1490167773416_63d3.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
+        <img  data-num="2" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/14041421-file_1490167492833_5532.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
+        <img  data-num="3" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/37397357-file_1490165885255_505c.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
+        <img  data-num="4" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/89675163-file_1490164463492_7c90.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
+        <img  data-num="5" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/69249046-file_1490167026695_861c.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
+        <img  data-num="6" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/2306671-file_1490166472947_bfca.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
+        <img  data-num="7" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/86793696-file_1490165360770_133fe.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
+        <img  data-num="8" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/35764853-file_1490164906253_16c54.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
+        <img  data-num="9" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/18135405-file_1490163328257_3899.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
+        <img  data-num="10" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/31314455-file_1490162920034_fe1a.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
+        <img  data-num="11" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/56871724-file_1490162253115_172aa.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
+        <img  data-num="12" data-original="http://on5qz8yjy.bkt.clouddn.com/17-3-22/7821053-file_1490161601119_a425.jpg?imageslim&amp;imageView2/2/w/660/h/660/interlace/0/q/80">
     </div>
+    <button id="add">滚到最底部，再点击按钮添加图片</button>
 </div>
 
 <body>
     <script src="./my-imglazyload.js"></script>
     <script>
     new imgLazyload({
-        container: document.querySelector('.w'),
         ordinal: true
             // showAnimation:"none"
     });
+
+    var btn=document.querySelector("#add");
+    btn.onclick=function(){
+        var div=document.createElement('div'),
+        html='<img  data-num="13" data-original="http://pic1.win4000.com/wallpaper/7/5826e67d07567.jpg">'
+        +'<img  data-num="14" data-original="http://img5.duitang.com/uploads/item/201204/10/20120410091024_ukViH.jpeg">'
+        +'<img  data-num="15" data-original="http://img2.niutuku.com/desk/1208/1422/ntk-1422-17658.jpg">'
+        +'<img  data-num="16" data-original="http://www.dingniu8.com/desk/UploadPic/2013-1/201311220560622.jpg">'
+        +'<img  data-num="17" data-original="http://h6.86.cc/walls/20150508/1024x768_03bfc4e71a6f938.jpg">'
+        +'<img  data-num="18" data-original="http://img.bizhi.sogou.com/images/2012/05/3/8783.jpg">'
+        +'<img  data-num="19" data-original="http://pic1.win4000.com/wallpaper/8/570f378debe36.jpg">'
+        +'<img  data-num="20" data-original="http://img4.imgtn.bdimg.com/it/u=382041659,3585629925&fm=21&gp=0.jpg">';
+      div.innerHTML=html;
+      document.querySelector(".w").appendChild(div);
+        new imgLazyload({
+            ordinal: true
+        });
+        document.querySelector('.ww').scrollTop=document.querySelector('.ww').scrollTop+200;
+    }
     </script>
 </body>
 
