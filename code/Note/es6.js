@@ -61,7 +61,20 @@ function getFullName(obj) {
 
 // best   //参数解构
 function getFullName({ firstName, lastName }) {};     //如果没有传参会报错
+==
+function getFullName(_ref) {
+  var firstName = _ref.firstName,
+      lastName = _ref.lastName;
+}; 
+
+
 function getFullName({ firstName, lastName }={}) {};
+==
+function getFullName() {
+  var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+      firstName = _ref.firstName,
+      lastName = _ref.lastName;
+};
 
 
 
