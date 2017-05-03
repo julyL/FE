@@ -27,7 +27,7 @@
                 args = arguments;
             setTimeout(function() {
                 fn.apply(context, args);
-            },0); // 同一执行队列中,原生Promise是先于setTimeout实现的,自己实现暂时用setTimeout模拟
+            }, 0); // 同一执行队列中,原生Promise是先于setTimeout实现的,自己实现暂时用setTimeout模拟
         }
     }
 
@@ -54,16 +54,33 @@
         return this.then(null, rjfn)
     }
     Promise.prototype.then = function(refn, rjfn) {
-            var returnPro = new Promise(function() {});
+            var returnPro = new Promise(function() {}),
+                returnVal;
             this.thenPromise = returnPro;
-            this.resolveQueue.push(refn);
-            this.rejectQueue.push(rjfn);
 
             if (this.status == 'resolve') { //执行then时,如果状态已经不是pending,则执行相应函数
-                this._resolve(this.value);
+                setTimeout(function() {
+                    try {
+                        returnVal = refn(this.value);
+                        ResolvePromise(this.thenPromise, returnVal);
+                    } catch (error) {
+                        this.thenPromise._reject(error);
+                    }
+                }.bind(this));
             }
             if (this.status == 'reject') {
-                this._reject(this.value);
+                setTimeout(function() {
+                    try {
+                        returnVal = rjfn(this.value);
+                        ResolvePromise(this.thenPromise, returnVal);
+                    } catch (error) {
+                        this.thenPromise._reject(error);
+                    }
+                }.bind(this));
+            }
+            if (this.status == 'pending') {
+                this.resolveQueue.push(refn);
+                this.rejectQueue.push(rjfn);
             }
             return returnPro;
         }
@@ -81,48 +98,69 @@
                 this.thenPromise._resolve(resolveData);
                 return;
             }
-            try { //如果 onFulfilled 或者 onRejected 抛出一个异常 e ，则 promise2 必须拒绝执行，并返回拒因 e
+            try {
                 returnVal = handle(resolveData);
+                ResolvePromise(this.thenPromise, returnVal)
             } catch (error) {
-                this.thenPromise.status = 'reject';
                 this.thenPromise.value = error;
+                this.thenPromise.status = 'reject';
                 this.thenPromise._reject(error);
-                return;
-            }
-            if (isObject(returnVal || isFunction(returnVal))) { //如果返回值为对象或者函数
-                if (returnVal == this.thenPromise) { //如果 promise 和 x 指向同一对象，以 TypeError 为据因拒绝执行 promise
-                    this.thenPromise.status = 'reject';
-                    var error= new TypeError('[[Resolve]](promise, x),promise 和 x 不能指向同一对象');
-                    this.thenPromise.value =error;
-                    this.thenPromise._reject(error);
-                } else if (returnVal instanceof Promise) { //如果 x 为 Promise ，则使 promise 接受 x 的状态
-                    try {
-                        returnVal.then(this.thenPromise._resolve.bind(this.thenPromise), this.thenPromise._reject.bind(this.thenPromise));
-                    } catch (error) {
-                        this.thenPromise.status = 'reject';
-                        this.thenPromise.value = error;
-                        this.thenPromise._reject(error);
-                    }
-                } else { //如果 x 为对象或者函数
-                    try { //如果取 x.then 的值时抛出错误 e ，则以 e 为据因拒绝 promise
-                        var then = returnVal.then;
-                        if (isFunction(then)) {
-                            then.call(returnVal, this.thenPromise._resolve.bind(this.thenPromise), this.thenPromise._reject.bind(this.thenPromise));
-                        }
-                    } catch (error) {
-                        this.thenPromise.status = 'reject';
-                        this.thenPromise.value = error;
-                        this.thenPromise._reject(error);
-                    }
-                }
-            } else {
-                this.thenPromise.value = returnVal;
-                this.thenPromise.status = 'resolve';
-                this.thenPromise._resolve(returnVal);
             }
         }
     }
 
+    function ResolvePromise(thenPromise, x) {
+        var thenCalledOrThrow = false;
+        if (isObject(x || isFunction(x))) { //如果返回值为对象或者函数
+            if (x == thenPromise) { //如果 promise 和 x 指向同一对象，以 TypeError 为据因拒绝执行 promise
+                thenPromise.status = 'reject';
+                var error = new TypeError('[[Resolve]](promise, x),promise 和 x 不能指向同一对象');
+                thenPromise.value = error;
+                thenPromise._reject(error);
+            } else if (x instanceof Promise) { //如果 x 为 Promise ，则使 promise 接受 x 的状态
+                try {
+                    if (x.status == 'pending') {
+                        x.then(function(v) {
+                            ResolvePromise(thenPromise, v)
+                        }, thenPromise._reject)
+                    } else {
+                        x.then(thenPromise._resolve, thenPromise._reject)
+                    }
+                } catch (error) {
+                    thenPromise.status = 'reject';
+                    thenPromise.value = error;
+                    thenPromise._reject(error);
+                }
+            } else { //如果 x 为对象或者函数
+                try { //如果取 x.then 的值时抛出错误 e ，则以 e 为据因拒绝 promise
+                    var then = x.then;
+                    if (isFunction(then)) {
+                        x.then(function(y) {
+                            if (thenCalledOrThrow) return;
+                            thenCalledOrThrow = true;
+                            return ResolvePromise(thenPromise, y, thenPromise._resolve, thenPromise._reject)
+                        }, function(error) {
+                            if (thenCalledOrThrow) return;
+                            thenCalledOrThrow = true;
+                            thenPromise._reject(error);
+                        });
+                    } else {
+                        thenPromise.value = x;
+                        thenPromise.status = 'resolve';
+                        thenPromise._resolve(x);
+                    }
+                } catch (error) {
+                    thenPromise.status = 'reject';
+                    thenPromise.value = error;
+                    thenPromise._reject(error);
+                }
+            }
+        } else {
+            thenPromise.value = x;
+            thenPromise.status = 'resolve';
+            thenPromise._resolve(x);
+        }
+    }
     Promise.prototype._reject = function(resolveData) {
         var handle,
             returnVal;
@@ -130,48 +168,19 @@
         this.value = resolveData;
         while (this.rejectQueue.length > 0) { //2.2.6  当 promise 成功执行时，所有 onFulfilled 需按照其注册顺序依次回调
             handle = this.rejectQueue.shift();
-            if (!isFunction(handle)) { //如果 onRejected 不是函数且 promise1 拒绝执行， promise2 必须拒绝执行并返回相同的据因
+            if (!isFunction(handle)) {
                 this.thenPromise.value = resolveData;
-                this.thenPromise.status = 'reject';
+                this.thenPromise.status = 'resolve';
                 this.thenPromise._reject(resolveData);
                 return;
             }
-            try { //如果 onFulfilled 或者 onRejected 抛出一个异常 e ，则 promise2 必须拒绝执行，并返回拒因 e
+            try {
                 returnVal = handle(resolveData);
+                ResolvePromise(this.thenPromise, returnVal)
             } catch (error) {
-                this.thenPromise.status = 'reject';
                 this.thenPromise.value = error;
+                this.thenPromise.status = 'reject';
                 this.thenPromise._reject(error);
-                return;
-            }
-            if (isObject(returnVal || isFunction(returnVal))) { //如果返回值为对象或者函数
-                if (returnVal == this.thenPromise) { //如果 promise 和 x 指向同一对象，以 TypeError 为据因拒绝执行 promise
-                    this.thenPromise.status = 'reject';
-                    this.thenPromise.value = new TypeError('[[Resolve]](promise, x),promise 和 x 不能指向同一对象');
-                } else if (returnVal instanceof Promise) { //如果 x 为 Promise ，则使 promise 接受 x 的状态
-                    try {
-                        then.call(returnVal, this.thenPromise._resolve.bind(this.thenPromise), this.thenPromise._reject.bind(this.thenPromise));
-                    } catch (error) {
-                        this.thenPromise.status = 'reject';
-                        this.thenPromise.value = error;
-                        this.thenPromise._reject(error);
-                    }
-                } else { //如果 x 为对象或者函数
-                    try { //如果取 x.then 的值时抛出错误 e ，则以 e 为据因拒绝 promise
-                        var then = returnVal.then;
-                        if (isFunction(then)) {
-                            then.call(returnVal, this.thenPromise._resolve.bind(this.thenPromise), this.thenPromise._reject.bind(this.thenPromise));
-                        }
-                    } catch (error) {
-                        this.thenPromise.status = 'reject';
-                        this.thenPromise.value = error;
-                        this.thenPromise._reject(error);
-                    }
-                }
-            } else {
-                this.thenPromise.value = returnVal;
-                this.thenPromise.status = 'resolve';
-                this.thenPromise._resolve(returnVal);
             }
         }
     }
@@ -202,19 +211,19 @@
         return returnPromise;
     }
     Promise.race = function(queue) {
-        if (Object.prototype.toString.call(queue) != "[object Array]") {
-            return;
+            if (Object.prototype.toString.call(queue) != "[object Array]") {
+                return;
+            }
+            var returnPromise = new Promise(function() {}),
+                resolveNum = 0;
+            for (var i = 0; i < queue.length; i++) {
+                queue[i].then(function() {
+                    returnPromise._resolve();
+                });
+            }
+            return returnPromise;
         }
-        var returnPromise = new Promise(function() {}),
-            resolveNum = 0;
-        for (var i = 0; i < queue.length; i++) {
-            queue[i].then(function() {
-                returnPromise._resolve();
-            });
-        }
-        return returnPromise;
-    }
-    // 测试
+        // 测试
     Promise.deferred = Promise.defer = function() {
         var dfd = {}
         dfd.promise = new Promise(function(resolve, reject) {
