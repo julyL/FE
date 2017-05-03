@@ -1,7 +1,13 @@
 /*
     author: julyL
     照规范试图写的一个Promise库 
-    (没有进行专业的测试,仅适合promise的学习使用)
+    规范地址：http://malcolmyu.github.io/malnote/2015/06/12/Promises-A-Plus/
+
+    全局安装
+        npm i -g promises-aplus-tests
+    运行测试
+         promises-aplus-tests my-promise.js
+    ( 2.2.4, 2.2.6, 2.3.3测试未通过)
  */
 (function(global, factory) {
     typeof exports === 'object' && typeof module !== "undefined" ? module.exports = factory() :
@@ -21,7 +27,7 @@
                 args = arguments;
             setTimeout(function() {
                 fn.apply(context, args);
-            }); // 同一执行队列中,原生Promise是先于setTimeout实现的,自己实现暂时用setTimeout模拟
+            },0); // 同一执行队列中,原生Promise是先于setTimeout实现的,自己实现暂时用setTimeout模拟
         }
     }
 
@@ -44,23 +50,24 @@
             asyncExcute(function() { this._reject(error) }); //  new Promise(()=>{ 出现异常... }).then(refn,rjfn);    出现异常时then还未执行, rjfn还未加入到rejectQueue中  
         }
     }
-    Promise.prototype.catch=function(rjfn){
-        return this.then(null,rjfn)
+    Promise.prototype.catch = function(rjfn) {
+        return this.then(null, rjfn)
     }
     Promise.prototype.then = function(refn, rjfn) {
-        var returnPro = new Promise(function() {});
-        this.thenPromise = returnPro;
-        this.resolveQueue.push(refn);
-        this.rejectQueue.push(rjfn);
+            var returnPro = new Promise(function() {});
+            this.thenPromise = returnPro;
+            this.resolveQueue.push(refn);
+            this.rejectQueue.push(rjfn);
 
-        if (this.status == 'resolve') { //执行then时,如果状态已经不是pending,则执行相应函数
-            this._resolve(this.value);
+            if (this.status == 'resolve') { //执行then时,如果状态已经不是pending,则执行相应函数
+                this._resolve(this.value);
+            }
+            if (this.status == 'reject') {
+                this._reject(this.value);
+            }
+            return returnPro;
         }
-        if (this.status == 'reject') {
-            this._reject(this.value);
-        }
-        return returnPro;
-    }
+        //  promise2 = promise1.then(onFulfilled, onRejected);
     Promise.prototype._resolve = function(resolveData) {
         var handle,
             returnVal;
@@ -68,7 +75,7 @@
         this.value = resolveData;
         while (this.resolveQueue.length > 0) { //2.2.6  当 promise 成功执行时，所有 onFulfilled 需按照其注册顺序依次回调
             handle = this.resolveQueue.shift();
-            if (!isFunction(handle)) { //不是函数  2.1.1 onFulfilled 不是函数，其必须被忽略
+            if (!isFunction(handle)) { //如果 onFulfilled 不是函数且 promise1 成功执行， promise2 必须成功执行并返回相同的值
                 this.thenPromise.value = resolveData;
                 this.thenPromise.status = 'resolve';
                 this.thenPromise._resolve(resolveData);
@@ -119,15 +126,12 @@
             returnVal;
         this.status = "resolve";
         this.value = resolveData;
-        if(this.reject()){
-
-        }
         while (this.rejectQueue.length > 0) { //2.2.6  当 promise 成功执行时，所有 onFulfilled 需按照其注册顺序依次回调
             handle = this.rejectQueue.shift();
-            if (!isFunction(handle)) { //不是函数  2.1.1 onFulfilled 不是函数，其必须被忽略
+            if (!isFunction(handle)) { //如果 onRejected 不是函数且 promise1 拒绝执行， promise2 必须拒绝执行并返回相同的据因
                 this.thenPromise.value = resolveData;
-                this.thenPromise.status = 'resolve';
-                this.thenPromise._resolve(resolveData);
+                this.thenPromise.status = 'reject';
+                this.thenPromise._reject(resolveData);
                 return;
             }
             try { //如果 onFulfilled 或者 onRejected 抛出一个异常 e ，则 promise2 必须拒绝执行，并返回拒因 e
@@ -208,8 +212,18 @@
         }
         return returnPromise;
     }
+    // 测试
+    Promise.deferred = Promise.defer = function() {
+        var dfd = {}
+        dfd.promise = new Promise(function(resolve, reject) {
+            dfd.resolve = resolve;
+            dfd.reject = reject;
+        })
+        return dfd
+    }
     return Promise;
 }));
+
 /*
 测试1:
 var a=new Promise(function(re,rj){
