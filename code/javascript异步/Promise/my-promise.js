@@ -7,7 +7,7 @@
         npm i -g promises-aplus-tests
     运行测试
          promises-aplus-tests my-promise.js
-    ( 2.2.4, 2.2.6, 2.3.3测试未通过)
+    ( 2.2.4, 2.2.6, 2.3.1,2.3.2 ,2.3.3测试未通过)
  */
 (function(global, factory) {
     typeof exports === 'object' && typeof module !== "undefined" ? module.exports = factory() :
@@ -92,7 +92,9 @@
             if (isObject(returnVal || isFunction(returnVal))) { //如果返回值为对象或者函数
                 if (returnVal == this.thenPromise) { //如果 promise 和 x 指向同一对象，以 TypeError 为据因拒绝执行 promise
                     this.thenPromise.status = 'reject';
-                    this.thenPromise.value = new TypeError('[[Resolve]](promise, x),promise 和 x 不能指向同一对象');
+                    var error= new TypeError('[[Resolve]](promise, x),promise 和 x 不能指向同一对象');
+                    this.thenPromise.value =error;
+                    this.thenPromise._reject(error);
                 } else if (returnVal instanceof Promise) { //如果 x 为 Promise ，则使 promise 接受 x 的状态
                     try {
                         returnVal.then(this.thenPromise._resolve.bind(this.thenPromise), this.thenPromise._reject.bind(this.thenPromise));
@@ -241,7 +243,7 @@ var a=new Promise(function(re,rj){
   console.log("after4000",data)
   console.l(error);
 }).catch(function(error){
-    console.log(error);
+    console.error("catch:"+error);
 })
 
 
