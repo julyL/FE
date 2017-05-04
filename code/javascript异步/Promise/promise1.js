@@ -1,6 +1,7 @@
 /*
   https://github.com/xieranmaya/blog/issues/3
- */
+  
+*/
 try {
     module.exports = Promise
 } catch (e) {}
@@ -13,9 +14,9 @@ function Promise(executor) {
     self.onRejectedCallback = []
 
     function resolve(value) {
-        if (value instanceof Promise) {
-            return value.then(resolve, reject)
-        }
+        // if (value instanceof Promise) {
+        //     return value.then(resolve, reject)
+        // }
         setTimeout(function() { // 异步执行所有的回调函数
             if (self.status === 'pending') {
                 self.status = 'resolved'
@@ -56,6 +57,8 @@ function resolvePromise(promise2, x, resolve, reject) {
 
     if (x instanceof Promise) {
         if (x.status === 'pending') { //because x could resolved by a Promise Object
+            // 如果x的状态还没有确定，那么它是有可能被一个thenable决定最终状态和值的
+            // 所以这里需要做一下处理，而不能一概的以为它会被一个“正常”的值resolve
             x.then(function(v) {
                 resolvePromise(promise2, v, resolve, reject)
             }, reject)
