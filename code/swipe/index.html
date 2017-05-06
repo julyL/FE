@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <link rel="stylesheet" href="">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+</head>
+<style>
+    *{
+    margin: 0;
+    padding: 0;
+}
+li{
+    list-style: none;
+}
+.box {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    overflow: hidden;
+}
+.box ul {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 30000px;
+    height: 100%;
+    -webkit-transition: transform .5s ease;
+    -moz-transition: transform .5s ease;
+    -ms-transition: transform .5s ease;
+    -o-transition: transform .5s ease;
+    transition: transform .5s ease;
+}
+ 
+.box li {
+    float: left;
+    width: 100vw;
+    height: 150px;
+    font-size: 40px;
+    line-height: 150px;
+    text-align: center;
+}
+.ad1{
+    background: red;
+}
+.ad2{
+    background: green;
+}
+.ad3{
+    background: grey;
+}
+.ad4{
+    background: darkgoldenrod;
+}
+.ad5{
+    background:darkseagreen;
+}
+
+</style>
+<body>
+    <div class="box" id="box">
+    <ul id="ul">
+        <li class="ad1">1</li>
+        <li class="ad2">2</li>
+        <li class="ad3">3</li>
+        <li class="ad4">4</li>
+    </ul>
+</div>
+<script src="swipe.js"></script>
+<script>
+    var con=document.querySelector("#ul"),
+        lis=document.querySelectorAll("li");
+    new Swipe({
+        container:con,
+        scroll:lis
+    })
+</script>
+</body>
+</html>
