@@ -5,60 +5,110 @@
     var Swipe = function(config) {
         this.container = config.container;
         this.scrollpart = config.scrollpart;
-        this.toggletime = config.toggletime;
+        this.time = config.time||1000;
+        this.isloop=config.isloop||true;
 
-        var con = this.container;
+        var con = this.container,
+            number=this.scrollpart.length,
+            scrollWidth=con.clientWidth,
+            triggerW=20,
+            startX,
+            endX,
+            moveendX,
+            stop=false,
+            wrap,
+            self=this;
 
-        con.addEventListener('touchstart', function(e) {
+        wrap=document.createElement('div');
+        for(var i=0;i<number+1;i++){
+            var node=i==number?this.scrollpart[0].cloneNode(true):this.scrollpart[i];
+            wrap.appendChild(node);
+            node.className=node.className+" swipe-item";
+            node.style.width = (100/(number+1))+"%";  
+        }
+        wrap.className="swipe-wrap";
+        wrap.style.width=(number+1)*100+"%";
+
+        this.container.appendChild(wrap);
+
+        var obj={},
+            index;
+        Object.defineProperty(obj, 'index', {
+            set:function(val){
+                index=val;
+                wrap.style.transform = 'translate3d(' + -(val * scrollWidth) + 'px,0,0)';
+            },
+            get:function(val){
+                return index;
+            }
+        });
+        obj.index=0;
+
+        wrap.addEventListener('touchstart', function(e) {
+            stop=true;
             e.preventDefault();
-            touchx = e.touches[0].clientX;
+            startX = e.touches[0].clientX;
         }, false);
 
+        wrap.addEventListener('touchmove', function(e) {
+             moveendX = e.changedTouches[0].pageX;
+            if (moveendX > startX) {
+                wrap.style.transform = 'translate3d(' + (-obj.index*scrollWidth+moveendX-startX) + 'px,0,0)';
+            } else if (moveendX < startX) {
+                wrap.style.transform = 'translate3d(' + (-obj.index*scrollWidth+moveendX-startX) + 'px,0,0)';
+            }
+        }, false);
 
+        wrap.addEventListener('touchend', function(e) {
+             endX = e.changedTouches[0].pageX;
+            if (endX + triggerW < startX) {
+                if (obj.index >= number - 1) {   //向左滑动
+                    obj.index=obj.index;
+                } else {
+                    obj.index++;   
+                }
+            } else if (endX - triggerW > startX) {
+                if (obj.index <= 0) {
+                    obj.index=0;
+                } else {
+                    obj.index--;
+                }
+            } else {
+                obj.index=obj.index;
+            }
+            stop=false;
+            setTimeout(function(){
+            self.start();
 
+            },this.time)
+        }, false);  
+        this.start=function(){
+            this.setloop();
+        }
+        this.setloop=function(){
+            var self=this;
+            if(stop){
+                return;
+            }
+            setTimeout(function(){
+                if(self.isloop){
+                    obj.index++;
+                    if(obj.index==number){
+                        setTimeout(function(){
+                            wrap.style.transition="none";
+                            obj.index=0;
+                            setTimeout(function(){
+                                wrap.style.transition="all .5s";
+                            },100)
+                            // obj.index=1;                         
+                        },300)
+                    }
+                    self.setloop();
+                }      
+            },this.time);
+        }
+        this.start();
     }
     return Swipe;
 }));
 
-
-// var ul = document.getElementById('ul');
-// var touchx = 0;
-// var index = 0;
-// var lilen = ul.getElementsByTagName('li').length;
-// var liwidth = document.documentElement.clientWidth;
-
-// ul.addEventListener('touchstart', function(e) {
-//     e.preventDefault();
-//     touchx = e.touches[0].clientX;
-//     console.log(touchx);
-// }, false);
-// ul.addEventListener('touchmove', function(e) {
-//     var offsetX = e.changedTouches[0].pageX;
-//     if (offsetX > touchx) {
-//         ul.style.transform = 'translate3d(' + (offsetX - touchx) + 'px,0,0)';
-//     } else if (offsetX < touchx) {
-//         console.log(1)
-//         ul.style.transform = 'translate3d(' + -(touchx - offsetX) + 'px,0,0)';
-//     }
-// }, false);
-// ul.addEventListener('touchend', function(e) {
-//     var endtouch = e.changedTouches[0].pageX;
-
-//     if (endtouch + 20 < touchx) {
-//         if (index >= lilen - 1) {
-//             ul.style.transform = 'translate3d(' + -(index * liwidth) + 'px,0,0)';
-//         } else {
-//             index++;
-//             ul.style.transform = 'translate3d(' + -(index * liwidth) + 'px,0,0)';
-//         }
-//     } else if (endtouch - 20 > touchx) {
-//         if (index <= 0) {
-//             ul.style.transform = 'translate3d(0,0,0)';
-//         } else {
-//             index--;
-//             ul.style.transform = 'translate3d(' + -(index * liwidth) + 'px,0,0)';
-//         }
-//     } else {
-//         ul.style.transform = 'translate3d(' + -(index * liwidth) + 'px,0,0)';
-//     }
-// }, false);
