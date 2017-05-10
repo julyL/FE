@@ -1,20 +1,11 @@
 To DO list:
 
-1.奇舞特训营文章阅读
+wait:
 
-3.常用组件代码的研究编写(Mint-ui等)
+奇舞特训营文章阅读
 
-4.jQuery源码
-
-5.Webpack2配置的研究   
-
-6.  看jsLite.js的源码
+常用组件代码的研究编写(Mint-ui等)
 
 
-;function(root,factory){
-  
-}(this,function(JSLite){
-  
-})
-
-
+now:
+	swipe组件  .....
