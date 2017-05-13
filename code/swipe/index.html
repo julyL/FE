@@ -21,10 +21,8 @@ li{
     height: 150px;
     overflow: hidden;
 }
-.box ul {
-    position: absolute;
-    left: 0;
-    top: 0;
+#con-w {
+    position: relative;
     width: 100%;
     height: 100%;
     -webkit-transition: transform .5s ease;
@@ -34,11 +32,19 @@ li{
     transition: transform .5s ease;
 }
  
-.box li {
-    float: left;
+img {
+    position: absolute;
+    height: 100%:;
+    width: 100%;
+    display: none;
     font-size: 40px;
     line-height: 150px;
     text-align: center;
+}
+.swipe-active{
+    display: block!important;
+    z-index: 2;
+    transform: translate3d(0px, 0px, 0px);
 }
 .swipe-wrap{
     overflow: hidden;
@@ -50,39 +56,24 @@ li{
     height: 100%;
 }
 
-.ad1{
-    background: red;
-}
-.ad2{
-    background: green;
-}
-.ad3{
-    background: grey;
-}
-.ad4{
-    background: darkgoldenrod;
-}
-.ad5{
-    background:darkseagreen;
-}
 
 </style>
 <body>
     <div class="box" id="box">
-    <ul id="ul">
-        <li class="ad1">1</li>
-        <li class="ad2">2</li>
-        <li class="ad3">3</li>
-        <li class="ad4">4</li>
-    </ul>
+    <div id="con-w">
+        <img src="http://img1.imgtn.bdimg.com/it/u=3923274428,65172173&fm=23&gp=0.jpg" alt="">
+        <img src="http://img4.imgtn.bdimg.com/it/u=2500832421,2923007015&fm=23&gp=0.jpg" alt="">
+        <img src="http://img3.imgtn.bdimg.com/it/u=3163391540,2448539783&fm=23&gp=0.jpg " alt="">
+        <img src="http://img0.imgtn.bdimg.com/it/u=3423638125,2659756083&fm=23&gp=0.jpg" alt="">
+    </div>
 </div>
 <script src="swipe.js"></script>
 <script>
-    var con=document.querySelector("#ul"),
-        lis=document.querySelectorAll("li");
+    var con=document.querySelector("#con-w"),
+        imgs=document.querySelectorAll("img");
     new Swipe({
         container:con,
-        child:lis
+        child:imgs
     })
 </script>
 </body>
