@@ -1,0 +1,29 @@
+.swipe-container{
+	position: relative;
+    -webkit-transition: transform .5s ease;
+    transition: transform .5s ease;
+}
+.swipe-item{
+	display: none;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}
+.swipe-indicators{
+	position: absolute;
+    bottom: 10px;
+    left: 50%;
+    -webkit-transform: translateX(-50%);
+    transform: translateX(-50%);
+}
+.swipe-indicator{
+	 width: 8px;
+    height: 8px;
+    display: inline-block;
+    border-radius: 100%;
+    background: #000;
+    margin: 0 3px;
+}
+.swipe-indicators .is-active{
+	background: #fff;
+}
