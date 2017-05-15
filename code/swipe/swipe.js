@@ -5,14 +5,14 @@
     var Swipe = function(config) {
         this.container = config.container;
         this.child = config.child;
-        this.intervaltime = config.intervaltime || 5000;
-        this.timer = null;
+        this.intervalTime = config.intervalTime || 5000; //不可设置为 0
         this.showIndicators = config.showIndicators === false ? false : true;
+        this.speed = config.speed || 500;
+        this.triggerDistance = config.triggerDistance || 40;
         var con = this.container,
             clientW = con.clientWidth,
             len = this.child.length,
             self = this,
-            limitWidth = 40,
             indicators,
             indicator = [],
             activeIndicator;
@@ -25,13 +25,13 @@
             mX: 0,
             eX: 0,
             activeIndex: 0,
-            animating: false,
             prevElement: this.child[len - 1],
             nextElement: this.child[1],
-            activeElement: this.child[0],
-            moveDirection: "0", //   -1:左  1:右 
+            activeElement: this.child[0],    
+            moveDirection: 0, //   -1:左  1:右 
+            timer: null,
         }
-        this.status=status;
+        this.status = status;
         self.container.classList.add("swipe-container");
         this.child.forEach(function(el) {
             el.classList.add("swipe-item");
@@ -55,42 +55,30 @@
 
         function touchStart(e) {
             stopAnimate();
-            status.X = self.getX(status.activeElement);
-            self.stopTransition();
+            stopTransition();
+            status.X = getX(status.activeElement);
             status.sX = e.changedTouches[0].pageX;
         }
 
-        function setLocation(el, x) {
-            el.style.transform = "translate3d(" + (x) + "px, 0px, 0px)";
-        }
-
         function touchMove(e) {
-            self.stopTransition();
+            stopTransition();
             status.mX = e.changedTouches[0].pageX;
             var changeX = status.X + status.mX - status.sX;
             if (status.mX > status.sX) { // moveDirection=1  右边
-                if (status.moveDirection == -1) { //  先左滑动 再右滑动 (当前status.activeIndex右边的位置可能出现错位，进行手动定位修复)
-                    self.fixLocation(status.activeIndex == len - 1 ? 0 : status.activeIndex + 1)
+                if (status.moveDirection == -1) { //  先左滑动,接着右滑动 (当前status.activeIndex右边的dom定位可能出错,进行手动定位修复)
+                    fixLocation(getNextIndex())
                 }
                 status.moveDirection = 1;
-                // console.log(status.activeIndex, "->")
-                status.prevElement = self.child[status.activeIndex == 0 ? len - 1 : status.activeIndex - 1];
+                status.prevElement = self.child[getPrevIndex()];
                 status.prevElement.style.display = "block";
-                if (!status.animating) { // 不是在切换动画过程中，则设置初始位置
-                    setLocation(status.prevElement, -clientW);
-                }
                 setLocation(status.prevElement, changeX - clientW);
             } else { // moveDirection=-1  左边
                 if (status.moveDirection == 1) {
-                    self.fixLocation(status.activeIndex == 0 ? len - 1 : status.activeIndex - 1)
+                    fixLocation(getPrevIndex())
                 }
                 status.moveDirection = -1;
-                // console.log(status.activeIndex, "<-")
-                status.nextElement = self.child[status.activeIndex == len - 1 ? 0 : status.activeIndex + 1];
+                status.nextElement = self.child[getNextIndex()];
                 status.nextElement.style.display = "block";
-                if (!status.animating) {
-                    setLocation(status.nextElement, clientW);
-                }
                 setLocation(status.nextElement, changeX + clientW);
             }
             status.activeElement = self.child[status.activeIndex];
@@ -98,69 +86,113 @@
         }
 
         function touchEnd(e) {
+            setTransition();
             status.moveDirection = 0;
-            self.setTransition();
             status.eX = e.changedTouches[0].pageX;
             var diff = status.eX - status.sX;
             if (diff > 0) { // 右滑动
-                if (diff > limitWidth) {
+                if (diff >= self.triggerDistance) {
                     setLocation(status.prevElement, 0);
                     setLocation(status.activeElement, clientW);
-                    status.activeIndex = status.activeIndex == 0 ? len - 1 : status.activeIndex - 1;
+                    status.activeIndex = getPrevIndex();
                 } else {
                     setLocation(status.prevElement, -clientW);
                     setLocation(status.activeElement, 0);
                 }
             } else if (diff < 0) { //左滑动
-                if (-diff > limitWidth) {
+                if (-diff >= self.triggerDistance) {
                     setLocation(status.nextElement, 0);
                     setLocation(status.activeElement, -clientW);
-                    status.activeIndex = status.activeIndex == len - 1 ? 0 : status.activeIndex + 1;
+                    status.activeIndex = getNextIndex();
                 } else {
                     setLocation(status.nextElement, clientW);
                     setLocation(status.activeElement, 0);
                 }
             }
-            // debugger;
             status.activeElement = self.child[status.activeIndex];
-            startAnimate();
+        }
+
+        function getPrevIndex() {
+            return status.activeIndex == 0 ? len - 1 : status.activeIndex - 1;
+        }
+
+        function getNextIndex() {
+            return status.activeIndex == len - 1 ? 0 : status.activeIndex + 1;
+        }
+
+        function addEvent(el, type, handle, iscapture) {
+            el.addEventListener(type, handle, iscapture || false);
+        }
+
+        function issupportCss3() {
+            var div = document.createElement("div");
+            return div.style.transform === undefined ? false : true;
+        }
+
+        function stopTransition() {
+            self.child.forEach(function(el) {
+                el.style.transitionDuration = '0s';
+            })
+        }
+
+        function setTransition() {
+            var speed = (self.speed / 1000) + "s";
+            self.child.forEach(function(el) {
+                el.style.transitionDuration = speed;
+            })
+        }
+
+        function getX(el) {
+            var t = el.style.tranform;
+            return /translate3d\((.*?),.*/g.exec(t) && /translate3d\((.*?),.*/g.exec(t)[0].slice(0, -2);
+        }
+
+        function fixLocation(index) {
+            var el = self.child[index];
+            el.style.display = "none";
+            el.style.transform = "none";
+        }
+
+        function setLocation(el, x) {
+            el.style.transform = "translate3d(" + (x) + "px, 0px, 0px)";
+        }
+
+        function stopAnimate() {
+            clearTimeout(status.timer);
+            status.timer=null;
+        }
+
+        function startAnimate() {
+            status.timer = setTimeout(function() {
+                slide();
+            }, self.intervalTime)
         }
 
         function slide() {
-            status.nextElement = self.child[status.activeIndex == len - 1 ? 0 : status.activeIndex + 1];
-            self.stopTransition();
-            status.nextElement.style.display = 'block';
+            stopTransition();
+            status.nextElement = self.child[getNextIndex()];
             setLocation(status.nextElement, clientW);
+            status.nextElement.style.display = 'block';
+            //由于需要设置nextElement的起始位置和最终位置，必须添加setTimeout否则没有动画效果
             setTimeout(function() {
-                self.setTransition();
+                setTransition();
                 setLocation(status.activeElement, -clientW);
                 setLocation(status.nextElement, 0);
                 status.activeIndex = (status.activeIndex + 1) % len;
                 status.activeElement = self.child[status.activeIndex];
-            },10)
+            }, 20)
         }
-        window.slide = slide;
-
-        function stopAnimate() {
-            status.animating = false;
-            clearInterval(self.timer);
-        }
-
-        function startAnimate() {
-            status.animating = true;
-            self.timer = setInterval(function() {
-                slide();
-            }, self.intervaltime)
-        }
-
+        
         function initEvent() {
-            self.addEvent(con, 'touchstart', touchStart);
-            self.addEvent(con, 'touchmove', touchMove);
-            self.addEvent(con, 'touchend', touchEnd);
+            addEvent(con, 'touchstart', touchStart);
+            addEvent(con, 'touchmove', touchMove);
+            addEvent(con, 'touchend', touchEnd);
             self.child.forEach(function(el, number) {
-                self.addEvent(el, "transitionend", function() {
+                addEvent(el, "transitionend", function() {
                     if (el != status.activeElement) {
                         el.style.display = "none";
+                    }else{
+                        startAnimate();     
                     }
                     if (self.showIndicators) {
                         activeIndicator.classList.remove("is-active");
@@ -174,33 +206,7 @@
         initEvent();
     }
     Swipe.prototype = {
-        addEvent: function(el, type, handle, iscapture) {
-            el.addEventListener(type, handle, iscapture || false);
-        },
-        issupportCss3: function() {
-            var div = document.createElement("div");
-            return div.style.transform === undefined ? false : true;
-        },
-        stopTransition: function() {
-            this.child.forEach(function(el) {
-                el.style.transitionDuration = '0s';
-            })
-        },
-        setTransition: function() {
-            this.child.forEach(function(el) {
-                el.style.transitionDuration = '.5s';
-            })
-        },
-        getX: function(el) {
-            var t = el.style.tranform;
-            return /translate3d\((.*?),.*/g.exec(t) && /translate3d\((.*?),.*/g.exec(t)[0].slice(0, -2);
-        },
-        fixLocation: function(index) {
-            var el = this.child[index];
-            el.style.display = "none";
-            el.style.transform = "none";
-        },
-        getIndex:function(){
+        getIndex: function() {
             return this.status.activeIndex;
         }
     }

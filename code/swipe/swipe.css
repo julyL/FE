@@ -1,7 +1,6 @@
 .swipe-container{
 	position: relative;
-    -webkit-transition: transform .5s ease;
-    transition: transform .5s ease;
+    overflow: hidden;
 }
 .swipe-item{
 	display: none;
