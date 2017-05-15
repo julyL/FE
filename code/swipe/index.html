@@ -19,24 +19,24 @@
 .demo1 {
     width: 100%;
     height: 250px;
-    overflow: hidden;
+    margin-bottom: 30px;
 }
 
 .demo2 {
-    margin: 100px 0;
     width: 100%;
     height: 250px;
-    overflow: hidden;
 }
 </style>
 
 <body>
+    <h3>demo1</h3>
     <div class="demo1">
         <img src="http://desk.fd.zol-img.com.cn/t_s960x600c5/g5/M00/0D/09/ChMkJlf8ljeIa5fKABQp0_GXxjYAAWzegKsIMwAFCnr514.jpg">
         <img src="http://desk.fd.zol-img.com.cn/t_s960x600c5/g5/M00/0D/09/ChMkJlf8lkWICp-SABCGW2CZsd4AAWzfQIAxTUAEIZz293.jpg">
         <img src="http://desk.fd.zol-img.com.cn/t_s960x600c5/g5/M00/0D/09/ChMkJ1f8lkeIWcwbAA8_S_Qr5dQAAWzfQPG2ukADz9j859.jpg">
         <img src="http://desk.fd.zol-img.com.cn/t_s960x600c5/g5/M00/01/0E/ChMkJlbKwbKINSFrABARnLk83qAAALGcgBXAh0AEBG0045.jpg">
     </div>
+    <h3>demo2</h3>
     <div class="demo2">
         <img src="http://desk.fd.zol-img.com.cn/t_s960x600c5/g5/M00/0D/09/ChMkJlf8ljeIa5fKABQp0_GXxjYAAWzegKsIMwAFCnr514.jpg">
         <img src="http://desk.fd.zol-img.com.cn/t_s960x600c5/g5/M00/0D/09/ChMkJlf8lkWICp-SABCGW2CZsd4AAWzfQIAxTUAEIZz293.jpg">
@@ -58,8 +58,9 @@
     var swipe2 = new Swipe({
         container: demo2,
         child: imgs2,
-        intervaltime: 3000,
-        showIndicators: false
+        showIndicators: false,
+        intervalTime: 7000,
+        speed:1000
     })
     </script>
 </body>
