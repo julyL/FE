@@ -201,9 +201,9 @@
                     }
                 })
             })
-            startAnimate();
         }
         initEvent();
+        startAnimate();
     }
     Swipe.prototype = {
         getIndex: function() {

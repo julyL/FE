@@ -41,3 +41,5 @@ js
 
 ```
 
+访问示例:  
+[https://julyl.github.io/Code/code/swipe/](https://julyl.github.io/Code/code/swipe/)  (切换到手机模式)
