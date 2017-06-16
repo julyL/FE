@@ -1,0 +1,19 @@
+{
+  "name": "july",
+  "version": "1.0.0",
+  "description": "| 地址   | 描述   |\r |:----|  :----   |  \r |[imglazyload.js](https://github.com/julyL/Code/blob/master/code/imglazyload/) |  原生js实现的图片懒加载   |    \r |[swipe.js](https://github.com/julyL/Code/blob/master/code/swipe/) |  移动端滑动组件   |",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@git.oschina.net:julyL/FeDevconfig.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.14.0",
+    "supervisor": "^0.12.0"
+  }
+}

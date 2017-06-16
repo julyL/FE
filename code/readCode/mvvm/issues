@@ -1,0 +1,12 @@
+1.数据更新之后,如何更新视图
+	文本的更新 例如: <p>{{a}}</p>         
+	思路:在{{a}}的父级P,标记一个属性。当vm.data.a改变时,更新P。
+	但是替换P的textContent或者innerHTML，会导致P内部元素原生绑定的事件丢失?  
+	这个方法可以用于input等表单元素(无法内嵌其他元素)的视图更新
+2.指令解析
+	正则或者属性判断
+
+
+get:  
+	node.attributes(类数组)可以获取 node的所有attribute。
+	var attr=node.attributes[0];  attr.name可以获取属性名称,attr.value或者属性值
