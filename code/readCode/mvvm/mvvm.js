@@ -24,16 +24,10 @@ function MVVM (options) {
   new Compile(options.el || document.body, this);
 }
 MVVM.prototype = {
-  /**
-   * [属性代理]
-   * @param  {[type]} key    [数据key]
-   * @param  {[type]} setter [属性set]
-   * @param  {[type]} getter [属性get]
-   */
-  _proxyData: function (key, setter, getter) {
+  _proxyData: function (key) {
     let self = this;
-    setter = setter ||
-    Object.defineProperty(self, key, {
+    setter = Object.defineProperty(self, key, {   
+    // vm.datakey=val  =>  vm._data.datakey=val;  形成映射关系(datakey为vm的data属性里面的key)
       configurable: false,
       enumerable: true,
       get: function proxyGetter() {
@@ -161,8 +155,8 @@ function hasOwn (obj, key) {
 function Observer(value) {
   this.value = value;
   this.dep = new Dep();
-  def(value, '__ob__', this);
-  if (Array.isArray(value)) {
+  def(value, '__ob__', this);   //__ob__标示已被Observer过
+  if (Array.isArray(value)) {  
     let augment = hasProto
       ? protoAugment
       : copyAugment;
@@ -188,15 +182,16 @@ Observer.prototype = {
 }
 
 function defineReactive$$1 (obj, key, val) {
-  let dep = new Dep();
-  let childOb = observe(val);
+  let dep = new Dep();      //dep 负责执行“事件”的订阅和发布  (vm.data中的key值都对应一个dep实例,当key对应的val发生改变,会执行updaterFn来更新视图)   updaterFn对应watcher实例中的cb(在初始化执行Compile时绑定的回调)
+  let childOb = observe(val);  //递归处理
   Object.defineProperty(obj, key, {
     enumerable: true,
     configurable: true,
     get: function() {
-      if (Dep.target) {
-        dep.depend();
-        if (childOb) {
+      // Dep.target用于存储临时的watcher对象
+      if (Dep.target) {    //Dep.target只有2中情况下会有值: 1.初始化watcher对象时 2.watcher对象执行update方法时 这2种情况都需要关联dep对象和watcher
+        dep.depend();      // 关联这2个实例对象   dep对象(发布者,执行notify方法通知watcher进行视图更新) <==>  watcher对象(订阅者,执行update方法进行视图更新)
+        if (childOb) {   //当key的val值为对象时,父级子级绑定同一个watcher对象
           childOb.dep.depend();
         }
       }
@@ -204,19 +199,19 @@ function defineReactive$$1 (obj, key, val) {
       return val;
     },
     set: function(newVal) {
-      if (val === newVal || (newVal !== newVal && val !== val)) {
+      if (val === newVal || (newVal !== newVal && val !== val)) {   // 值相等 或者 NaN的情况不需要更新
         return;
       }
       val = newVal;
       // 监听子属性
-      childOb = observe(newVal);
+      childOb = observe(newVal);    // newVal可能是对象,需要重新observe
       // 通知数据变更
       dep.notify();
     }
   })
 }
 
-function observe(value, asRootData) {
+function observe(value) {
   if (!value || typeof value !== 'object') {
     return;
   }
@@ -233,7 +228,7 @@ function observe(value, asRootData) {
  * @class 依赖类 Dep
  */
 let uid = 0;
-function Dep() {
+function Dep() {       
   // dep id
   this.id = uid++;
   // array 存储Watcher
@@ -271,19 +266,6 @@ Dep.prototype = {
     Dep.target.addDep(this);
   }
 }
-/**
-* Watcher.prototype = {
-*   get: function () {
-*     Dep.target = this;
-*     let value = this.getter.call(this.vm, this.vm);
-*     Dep.target = null;
-*     return value;
-*   },
-*   addDep: function (dep) {
-*     dep.addSub(this);
-*   }
-* }
-*/
 /**
  * @class 指令解析类 Compile
  * @param {[type]} el [element节点]
@@ -336,14 +318,14 @@ Compile.prototype = {
   },
   // 指令解析
   compile: function (node) {
-    let nodeAttrs = node.attributes;
+    let nodeAttrs = node.attributes;   //获得属性数组
     let self = this;
 
     [].slice.call(nodeAttrs).forEach(attr => {
-      let attrName = attr.name;
+      let attrName = attr.name;                  // x-model="a"
       if (self.isDirective(attrName)) {
-        let exp = attr.value;
-        let dir = attrName.substring(2);
+        let exp = attr.value;                   // exp='a'
+        let dir = attrName.substring(2);        //dir='model'
         // 事件指令
         if (self.isEventDirective(dir)) {
           compileUtil.eventHandler(node, self.$vm, exp, dir);
@@ -392,7 +374,7 @@ const compileUtil = {
   class: function (node, vm, exp) {
     this.bind(node, vm, exp, 'class');
   },
-  model: function(node, vm, exp) {
+  model: function(node, vm, exp) {    //  exp='a' data中的key
     this.bind(node, vm, exp, 'model');
 
     let self = this;
