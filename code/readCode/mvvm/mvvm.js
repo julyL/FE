@@ -17,11 +17,11 @@ function MVVM (options) {
   let data = this._data = this.$options.data;
   let self = this;
 
-  Object.keys(data).forEach(key => {
+  Object.keys(data).forEach(key => {   
     self._proxyData(key);
   });
-  observe(data, this);
-  new Compile(options.el || document.body, this);
+  observe(data, this);    // 遍历data,设置每个key的get和set,并设置一个dep实例
+  new Compile(options.el || document.body, this);  //遍历el的html树结构  -> 解析el中的自定义指令  ->  根据相应data的值来初始化视图  ->  为每个指令实例化一个watcher对象 
 }
 MVVM.prototype = {
   _proxyData: function (key) {
@@ -87,8 +87,7 @@ let arrayMethods = Object.create(arrayProto);
   'sort',
   'reverse'
 ].forEach(method => {
-  // 原始数组操作方法
-  let original = arrayMethods[method];
+  let original = arrayMethods[method];   // 原始方法
   def(arrayMethods, method, function () {
     let arguments$1 = arguments;
     let i = arguments.length;
@@ -148,14 +147,24 @@ function copyAugment (target, src, keys) {
 function hasOwn (obj, key) {
   return hasOwnProperty.call(obj, key)
 }
-/**
- *  @class 发布类 Observer that are attached to each observed
- *  @param {[type]} value [vm参数]
- */
+
+function observe(value) {     // 当传入的value为对象时,返回Observer实例
+  if (!value || typeof value !== 'object') {
+    return;
+  }
+  let ob;
+  if (hasOwn(value, '__ob__') && value.__ob__ instanceof Observer) {    // 当value为Observer实例时,直接返回Obsever实例
+    ob = value.__ob__;
+  } else  {
+    ob = new Observer(value);
+  }
+  return ob
+}
+
 function Observer(value) {
   this.value = value;
   this.dep = new Dep();
-  def(value, '__ob__', this);   //__ob__标示已被Observer过
+  def(value, '__ob__', this);   //  在__ob__上存储this,用来标示当前value已通过new Observer(value)实例化
   if (Array.isArray(value)) {  
     let augment = hasProto
       ? protoAugment
@@ -182,24 +191,24 @@ Observer.prototype = {
 }
 
 function defineReactive$$1 (obj, key, val) {
-  let dep = new Dep();      //dep 负责执行“事件”的订阅和发布  (vm.data中的key值都对应一个dep实例,当key对应的val发生改变,会执行updaterFn来更新视图)   updaterFn对应watcher实例中的cb(在初始化执行Compile时绑定的回调)
+  let dep = new Dep();      //dep 负责执行“事件”的订阅和发布  (vm.data中的key值都对应一个dep实例,当key对应的val发生改变,会执行updaterFn来更新视图)   updaterFn也就是watcher实例中的cb(在初始化执行Compile时绑定的回调)
   let childOb = observe(val);  //递归处理
   Object.defineProperty(obj, key, {
     enumerable: true,
     configurable: true,
     get: function() {
       // Dep.target用于存储临时的watcher对象
-      if (Dep.target) {    //Dep.target只有2中情况下会有值: 1.初始化watcher对象时 2.watcher对象执行update方法时 这2种情况都需要关联dep对象和watcher
-        dep.depend();      // 关联这2个实例对象   dep对象(发布者,执行notify方法通知watcher进行视图更新) <==>  watcher对象(订阅者,执行update方法进行视图更新)
-        if (childOb) {   //当key的val值为对象时,父级子级绑定同一个watcher对象
+      if (Dep.target) {    //  Dep.target只有2种情况下会有值:  1.初始化watcher对象时(执行compiler)  2.watcher对象执行update方法时(触发了setter)   这2种情况都需要关联dep对象和watcher
+        dep.depend();      //  在dep.subs中加入watcher对象     dep对象(发布者,执行notify方法通知watcher进行视图更新)  <==>  watcher对象(订阅者,执行update方法进行视图更新)
+        if (childOb) {     //  当key的val值为对象时,父级子级绑定同一个watcher对象
           childOb.dep.depend();
         }
       }
-
       return val;
     },
     set: function(newVal) {
-      if (val === newVal || (newVal !== newVal && val !== val)) {   // 值相等 或者 NaN的情况不需要更新
+      debugger;
+      if (val === newVal || (newVal !== newVal && val !== val)) {   // 值相等 或者 为NaN的情况不需要更新
         return;
       }
       val = newVal;
@@ -211,42 +220,16 @@ function defineReactive$$1 (obj, key, val) {
   })
 }
 
-function observe(value) {
-  if (!value || typeof value !== 'object') {
-    return;
-  }
-  let ob;
-  if (hasOwn(value, '__ob__') && value.__ob__ instanceof Observer) {
-    ob = value.__ob__;
-  } else  {
-    ob = new Observer(value);
-  }
-  return ob
-}
-
-/**
- * @class 依赖类 Dep
- */
 let uid = 0;
-function Dep() {       
-  // dep id
-  this.id = uid++;
-  // array 存储Watcher
-  this.subs = [];
+function Dep() {        
+  this.id = uid++;    // dep id
+  this.subs = [];     // array 存储Watcher
 }
 Dep.target = null;
 Dep.prototype = {
-  /**
-   * [添加订阅者]
-   * @param  {[Watcher]} sub [订阅者]
-   */
   addSub: function (sub) {
     this.subs.push(sub);
   },
-  /**
-   * [移除订阅者]
-   * @param  {[Watcher]} sub [订阅者]
-   */
   removeSub: function (sub) {
     let index = this.subs.indexOf(sub);
     if (index !== -1) {
@@ -257,8 +240,7 @@ Dep.prototype = {
   notify: function () {
     console.log('notify');
     this.subs.forEach(sub => {
-      // 执行sub的update更新函数
-      sub.update();
+      sub.update();    // 执行sub的update更新函数
     });
   },
   // add Watcher
@@ -266,6 +248,73 @@ Dep.prototype = {
     Dep.target.addDep(this);
   }
 }
+
+/**
+ * @class 观察类
+ * @param {[type]}   vm      [vm对象]
+ * @param {[type]}   expOrFn [属性表达式]
+ * @param {Function} cb      [回调函数(一半用来做view动态更新)]
+ */
+function Watcher(vm, expOrFn, cb) {
+  this.vm = vm;
+  expOrFn = expOrFn.trim();
+  this.expOrFn = expOrFn;
+  this.cb = cb;       //更新视图的方法
+  this.depIds = {};
+
+  if (typeof expOrFn === 'function') {      // 为指令事件时  @click="submit"   exp="submit"
+    this.getter = expOrFn
+  }
+  else {                                    // x-model="a.b"    exp="a.b"
+    this.getter = this.parseGetter(expOrFn);
+  }
+  this.value = this.get();
+}
+Watcher.prototype = {
+  update: function () {
+    this.run();
+  },
+  run: function () {
+    let newVal = this.get();
+    let oldVal = this.value;
+    if (newVal === oldVal) {
+      return;
+    }
+    this.value = newVal;
+    // 将newVal, oldVal挂载到MVVM实例上
+    this.cb.call(this.vm, newVal, oldVal);
+  },
+  get: function () {
+    debugger;
+    Dep.target = this;  // 将当前订阅者指向自己
+    let value = this.getter.call(this.vm, this.vm); // 触发getter，将自身添加到dep中
+    Dep.target = null;  // 添加完成 重置
+    return value;
+  },
+  // 添加Watcher to Dep.subs[]
+  addDep: function (dep) {
+    if (!this.depIds.hasOwnProperty(dep.id)) {
+      dep.addSub(this);
+      this.depIds[dep.id] = dep;
+    }
+  },
+  parseGetter: function (exp) {
+    if (/[^\w.$]/.test(exp)) return;
+
+    let exps = exp.split('.');
+
+    // 简易的循环依赖处理
+    return function(obj) {
+      debugger;
+        for (let i = 0, len = exps.length; i < len; i++) {  //循环取值  eg:  exp="a.b"   先往a对应的dep中push当前watcher对象, 再往b对应的dep中push当前watcher对象
+            if (!obj) return;
+            obj = obj[exps[i]];    // 这里会触发getter,从而关联watcher和dep
+        }
+        return obj;
+    }
+  }
+}
+
 /**
  * @class 指令解析类 Compile
  * @param {[type]} el [element节点]
@@ -276,10 +325,9 @@ function Compile(el, vm) {
   this.$el = this.isElementNode(el) ? el : document.querySelector(el);
 
   if (this.$el) {
-    this.$fragment = this.nodeFragment(this.$el);
+    this.$fragment = this.nodeFragment(this.$el);    // 用DocumentFragment存储el中的html
     this.compileElement(this.$fragment);
-    // 将文档碎片放回真实dom
-    this.$el.appendChild(this.$fragment)
+    this.$el.appendChild(this.$fragment);            // 将文档碎片放回真实dom   
   }
 }
 Compile.prototype = {
@@ -288,7 +336,7 @@ Compile.prototype = {
     let childNodes = el.childNodes;
     [].slice.call(childNodes).forEach(node => {
       let text = node.textContent;
-      let reg = /\{\{((?:.|\n)+?)\}\}/;
+      let reg = /\{\{((?:.|\n)+?)\}\}/;    
 
       // 如果是element节点
       if (self.isElementNode(node)) {
@@ -299,7 +347,8 @@ Compile.prototype = {
         // 匹配第一个选项
         self.compileText(node, RegExp.$1);
       }
-      // 解析子节点包含的指令
+
+      // 递归解析子节点
       if (node.childNodes && node.childNodes.length) {
         self.compileElement(node);
       }
@@ -321,11 +370,11 @@ Compile.prototype = {
     let nodeAttrs = node.attributes;   //获得属性数组
     let self = this;
 
-    [].slice.call(nodeAttrs).forEach(attr => {
-      let attrName = attr.name;                  // x-model="a"
+    [].slice.call(nodeAttrs).forEach(attr => {    //  遍历属性数组,对其中的自定义指令进行解析(compileUtil),并通过removeAttribute删除自定义属性
+      let attrName = attr.name;                   //  attrName="x-model"
       if (self.isDirective(attrName)) {
-        let exp = attr.value;                   // exp='a'
-        let dir = attrName.substring(2);        //dir='model'
+        let exp = attr.value;                     //  exp='a'
+        let dir = attrName.substring(2);          //  dir='model'
         // 事件指令
         if (self.isEventDirective(dir)) {
           compileUtil.eventHandler(node, self.$vm, exp, dir);
@@ -334,7 +383,6 @@ Compile.prototype = {
         else {
           compileUtil[dir] && compileUtil[dir](node, self.$vm, exp);
         }
-
         node.removeAttribute(attrName);
       }
     });
@@ -395,9 +443,8 @@ const compileUtil = {
     });
   },
   bind: function (node, vm, exp, dir) {
-    let updaterFn = updater[dir + 'Updater'];
-
-    updaterFn && updaterFn(node, this._getVmVal(vm, exp));
+    let updaterFn = updater[dir + 'Updater'];                 // 根据dir返回相应更新视图的方法
+    updaterFn && updaterFn(node, this._getVmVal(vm, exp));    // 进行视图的初始化
 
     new Watcher(vm, exp, function(value, oldValue) {
       updaterFn && updaterFn(node, value, oldValue);
@@ -412,11 +459,6 @@ const compileUtil = {
       node.addEventListener(eventType, fn.bind(vm), false);
     }
   },
-  /**
-   * [获取挂载在vm实例上的value]
-   * @param  {[type]} vm  [mvvm实例]
-   * @param  {[type]} exp [expression]
-   */
   _getVmVal: function (vm, exp) {
     // debugger;
     let val = vm;
@@ -427,12 +469,6 @@ const compileUtil = {
     });
     return val;
   },
-  /**
-   * [设置挂载在vm实例上的value值]
-   * @param  {[type]} vm    [mvvm实例]
-   * @param  {[type]} exp   [expression]
-   * @param  {[type]} value [新值]
-   */
   _setVmVal: function (vm, exp, value) {
     let val = vm;
     exps = exp.split('.');
@@ -462,69 +498,5 @@ const updater = {
     }
     $elm = undefined;
     node.value = typeof value === 'undefined' ? '' : value;
-  }
-}
-
-/**
- * @class 观察类
- * @param {[type]}   vm      [vm对象]
- * @param {[type]}   expOrFn [属性表达式]
- * @param {Function} cb      [回调函数(一半用来做view动态更新)]
- */
-function Watcher(vm, expOrFn, cb) {
-  this.vm = vm;
-  expOrFn = expOrFn.trim();
-  this.expOrFn = expOrFn;
-  this.cb = cb;
-  this.depIds = {};
-
-  if (typeof expOrFn === 'function') {
-    this.getter = expOrFn
-  }
-  else {
-    this.getter = this.parseGetter(expOrFn);
-  }
-  this.value = this.get();
-}
-Watcher.prototype = {
-  update: function () {
-    this.run();
-  },
-  run: function () {
-    let newVal = this.get();
-    let oldVal = this.value;
-    if (newVal === oldVal) {
-      return;
-    }
-    this.value = newVal;
-    // 将newVal, oldVal挂载到MVVM实例上
-    this.cb.call(this.vm, newVal, oldVal);
-  },
-  get: function () {
-    Dep.target = this;  // 将当前订阅者指向自己
-    let value = this.getter.call(this.vm, this.vm); // 触发getter，将自身添加到dep中
-    Dep.target = null;  // 添加完成 重置
-    return value;
-  },
-  // 添加Watcher to Dep.subs[]
-  addDep: function (dep) {
-    if (!this.depIds.hasOwnProperty(dep.id)) {
-      dep.addSub(this);
-      this.depIds[dep.id] = dep;
-    }
-  },
-  parseGetter: function (exp) {
-    if (/[^\w.$]/.test(exp)) return;
-
-    let exps = exp.split('.');
-
-    // 简易的循环依赖处理
-    return function(obj) {
-        for (let i = 0, len = exps.length; i < len; i++) {
-            if (!obj) return;
-            obj = obj[exps[i]];
-        }
-        return obj;
-    }
   }
 }

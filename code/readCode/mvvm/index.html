@@ -9,16 +9,19 @@
 </head>
 <body>
   <div id="mvvm">
-    <input type="text" x-model="a">
-    <p>{{ a }}</p>
+    <input type="text" x-model="a.b">
+    <p>{{ a.c}}</p>
   </div>
 </body>
 <script>
-debugger;
+// debugger;
 var vm = new MVVM({
   el: '#mvvm',
   data: {
-    a: 'test model',
+    a: {
+      b:1111,
+      c:222
+    },
     // b: 'hello MVVM',
     // c: [1, 2],
     // flag: true
