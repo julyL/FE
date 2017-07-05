@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>zepto event模块</title>
+    <script src="../zepto.js"></script>
+</head>
+<style>
+.box {
+    border: 1px solid #ccc;
+    height: 300px;
+    margin: 20px;
+    cursor: pointer;
+    background: #ba8fe5;
+}
+
+.child {
+    height: 200px;
+    margin: 20px;
+    cursor: pointer;
+    background: #8fe5ac;
+}
+
+.li {
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+    margin: 20px;
+    color: rebeccapurple;
+    cursor: pointer;
+}
+</style>
+
+<body>
+    <div class="box">box
+        <div class="child">child</div>
+    </div>
+    <div class="list">
+        <div class="li click">绑定child click</div>
+        <div class="li one">绑定child one</div>
+        <div class="li off">解绑child click</div>
+        <div class="li delegate">事件委托</div>
+        <div class="li offbox">解绑box click</div>
+        <div class="li trigger">trigger child click</div>
+        <!-- <div class="li"></div> -->
+    </div>
+    <script>
+    var q = document.querySelector.bind(document);
+    var $box = $('.box'),
+        $child = $(".child");
+
+    function clear() {
+        $box.off();
+        $child.off();
+    }
+
+    q(".click").onclick = function() {
+        console.log('bind click')
+        debugger;
+        $child.on("click", function() {
+            console.log('click')
+        })
+    }
+
+    q(".one").onclick = function() {
+        clear();
+        console.log('bind one');
+        // debugger;
+        $child.on("click", function() {
+            console.log('one')
+        }, 1)
+    }
+
+    q(".off").onclick = function() {
+        // debugger;
+        $child.off("click")
+        console.log('off child');
+    }
+
+    q(".delegate").onclick = function() {
+        clear();
+        console.log("delegate");
+        // debugger;
+        $box.on("click", ".child", function() {
+            console.log('child 委托在 box')
+        })
+    }
+
+    q(".offbox").onclick = function() {
+        console.log('off box');
+        // debugger;
+        $box.off("click")
+    }   
+
+    q(".trigger").onclick = function() {
+        // debugger;
+        $child.trigger("click");
+    }
+
+
+    </script>
+</body>
+
+</html>
