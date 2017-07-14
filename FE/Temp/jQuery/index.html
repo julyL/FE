@@ -11,44 +11,23 @@
 	margin: 0;
 	padding: 0;
 }
+.a{
+	background: red;
+	margin: 40px;
+	height: 200px;
+}
 .b{
 	background: blue;
+	margin: 50px;
 	height: 100px;
-	margin-top: 2000px;
 }
-.red{
-	background: red;
-}
-.fz20{
-	font-size: 20px;
-}
+
 </style>
 <body>
+	
+	<div class="a">   
+		<div class="b">1111</div>
+	</div>
 
-
-
-<script>
-var request = new XMLHttpRequest();
-request.open('GET', 'http://api.yitianyishu.com/system/new-theme', true);
-
-request.onload = function() {
-  if (request.status >= 200 && request.status < 400) {
-    // Success!
-    var data = JSON.parse(request.responseText);
-    console.log(data)
-  } else {
-    // We reached our target server, but it returned an error
-
-  }
-};
-
-request.onerror = function() {
-  // There was a connection error of some sort
-};
-
-request.send();
-	     
-
-</script>
 </body>
 </html>

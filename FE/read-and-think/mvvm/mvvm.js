@@ -1,3 +1,11 @@
+/*
+  think: 
+    实现一个mvvm需要做哪些事?
+    1. 将页面中的自定义指令(v-model v-html 和{{}}) 替换成data中相应的值(视图更新)     第一次视图更新时,需要关联视图和数据,这样数据变化才知道更新哪些视图
+        1.1 如何关联视图和数据?     每一个key中都有一个dep实例,dep存有相应的更新视图的"方法"。当key发生改变,会触发dep.notify进行广播,执行所有相应的"方法"
+    2. 如果指令是事件指令@click,则绑定原生的事件
+ */
+
 // Define Property
 function def (obj, key, val, enumerable) {
   Object.defineProperty(obj, key, {
@@ -191,7 +199,7 @@ Observer.prototype = {
 }
 
 function defineReactive$$1 (obj, key, val) {
-  let dep = new Dep();      //dep 负责执行“事件”的订阅和发布  (vm.data中的key值都对应一个dep实例,当key对应的val发生改变,会执行updaterFn来更新视图)   updaterFn也就是watcher实例中的cb(在初始化执行Compile时绑定的回调)
+  let dep = new Dep();      //dep 负责执行“事件”的订阅和发布 (vm.data中的key值都对应一个dep实例,当key对应的val发生改变,会执行updaterFn来更新视图)   updaterFn也就是watcher实例中的cb(在初始化执行Compile时绑定的回调)
   let childOb = observe(val);  //递归处理
   Object.defineProperty(obj, key, {
     enumerable: true,
