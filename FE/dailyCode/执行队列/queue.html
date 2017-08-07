@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <link rel="stylesheet" href="">
+</head>
+<style>
+img {
+    width: 100px;
+    height: 100px;
+    display: block;
+}
+</style>
+
+<body>
+    <div class="dest-wrap">
+        <img data-originurl='http://on5qz8yjy.bkt.clouddn.com/17-3-22/14188990-file_1490167773416_63d3.jpg'>
+        <img data-originurl='http://on5qz8yjy.bkt.clouddn.com/17-3-22/14041421-file_1490167492833_5532.jpg'>
+        <img data-originurl='http://on5qz8yjy.bkt.clouddn.com/17-3-22/7821053-file_1490161601119_a425.jpg'>
+        <img data-originurl='http://on5qz8yjy.bkt.clouddn.com/17-3-22/37397357-file_1490165885255_505c.jpg'>
+        <img data-originurl='http://on5qz8yjy.bkt.clouddn.com/17-3-22/89675163-file_1490164463492_7c90.jpg'>
+        <img data-originurl='http://on5qz8yjy.bkt.clouddn.com/17-3-22/69249046-file_1490167026695_861c.jpg'>
+        <img data-originurl='http://on5qz8yjy.bkt.clouddn.com/17-3-22/2306671-file_1490166472947_bfca.jpg'>
+        <img data-originurl='http://on5qz8yjy.bkt.clouddn.com/17-3-22/86793696-file_1490165360770_133fe.jpg'>
+        <img data-originurl='http://on5qz8yjy.bkt.clouddn.com/17-3-22/35764853-file_1490164906253_16c54.jpg'>
+        <img data-originurl='http://on5qz8yjy.bkt.clouddn.com/17-3-22/18135405-file_1490163328257_3899.jpg'>
+        <img data-originurl='http://on5qz8yjy.bkt.clouddn.com/17-3-22/31314455-file_1490162920034_fe1a.jpg'>
+        <img data-originurl='http://on5qz8yjy.bkt.clouddn.com/17-3-22/56871724-file_1490162253115_172aa.jpg'>
+    </div>
+    <script>
+    /**
+     * 执行队列
+     * @param {Object} data 
+     * {
+     * 		queue     类数组
+     * 		callback  执行回调
+     * }
+     */
+    function Queue(data) {
+        var queue = Array.prototype.slice.call(data.queue);
+        this.queue = queue;
+        this.callback = data.callback;
+    }
+    Queue.prototype.next = function() {
+        var handle = this.queue.shift();
+        handle && this.callback(handle);
+    }
+
+    var loadimg = new Queue({
+        queue: document.querySelectorAll('img'),
+        callback: function(dom) {
+            var image = new Image(),
+                originurl = dom.getAttribute('data-originurl'),
+                self = this;
+            image.onload = function() {
+                dom.src = originurl;
+                dom.removeAttribute('data-originurl');
+                self.next();
+            }
+            image.onerror = function() {
+                self.next();
+            }
+            image.src = originurl;
+        }
+    })
+    loadimg.next();
+    </script>
+</body>
+
+</html>
