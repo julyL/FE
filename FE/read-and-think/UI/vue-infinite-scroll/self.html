@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>js-infinite-scroll</title>
+</head>
+
+<body>
+    <style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    html,
+    body,
+    .scroll-w {
+        height: 800px;
+    }
+
+    .scroll-w {
+        background: #e2a4a4;
+        overflow: auto;
+    }
+
+    .app {
+        overflow: hidden;
+        background: #47c68c;
+        min-height: 110%;
+        width: 400px;
+        margin: 0 auto;
+    }
+
+    .app>div:nth-child(1) {
+        margin-top: 750px;
+    }
+    </style>
+    <div class="scroll-w">
+        <h1>无限滚动加载</h1>
+        <div class="app" v-infinite-scroll="loadMore" infinite-scroll-immediate-check=false infinite-scroll-disabled="busy" infinite-scroll-distance="300">
+        </div>
+    </div>
+    <script>
+    function InfiniteScroll(config) {
+        this.el = config.el || document.documentElement;
+        this.fn = config.fn;
+        this.distance = config.distance || 0;
+        this.autoFill = config.autoFill === undefined ? config.autoFill : false;   //未实现
+        this.lock = false;
+        this.scrollHandle = function() {
+            if (this._canload() && !this.lock) {
+                this.fn();
+            }
+        }
+
+        this._canload = function() {
+            var el = this.el;
+            if (el.scrollTop + el.clientHeight + this.distance >= el.scrollHeight) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        this.bindScroll();
+    }
+    InfiniteScroll.prototype = {
+        constructor: InfiniteScroll,
+        bindScroll: function() {
+            this.el.addEventListener('scroll', this.scrollHandle.bind(this), false);
+        },
+        unbindScroll: function() {
+            this.el.removeEventListener('scroll', this.scrollHandle.bind(this), false);
+        }
+    }
+
+    var container = document.querySelector('.scroll-w');
+    var infinite = new InfiniteScroll({
+        el: container,
+        distance: 100,
+        fn: function() {
+
+            var self = this;
+            self.lock = true;
+
+            console.log('loading... ' + new Date());
+            setTimeout(function() {
+                var d = document.createElement('div');
+                d.style.height = '100px';
+                d.innerHTML = +new Date();
+                container.appendChild(d);
+                console.log('end... ' + new Date());
+                self.lock = false
+            }, 1000)
+
+        }
+    })
+    </script>
+</body>
+
+</html>
