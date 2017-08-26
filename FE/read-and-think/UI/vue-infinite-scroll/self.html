@@ -38,63 +38,32 @@
     </style>
     <div class="scroll-w">
         <h1>无限滚动加载</h1>
-        <div class="app" v-infinite-scroll="loadMore" infinite-scroll-immediate-check=false infinite-scroll-disabled="busy" infinite-scroll-distance="300">
+        <div class="app">
         </div>
     </div>
+    <script src="./self-infinite-scroll.js"></script>
     <script>
-    function InfiniteScroll(config) {
-        this.el = config.el || document.documentElement;
-        this.fn = config.fn;
-        this.distance = config.distance || 0;
-        this.autoFill = config.autoFill === undefined ? config.autoFill : false;   //未实现
-        this.lock = false;
-        this.scrollHandle = function() {
-            if (this._canload() && !this.lock) {
-                this.fn();
-            }
-        }
+    var container = document.querySelector('.scroll-w'),
+         app = document.querySelector('.app');
 
-        this._canload = function() {
-            var el = this.el;
-            if (el.scrollTop + el.clientHeight + this.distance >= el.scrollHeight) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-        this.bindScroll();
-    }
-    InfiniteScroll.prototype = {
-        constructor: InfiniteScroll,
-        bindScroll: function() {
-            this.el.addEventListener('scroll', this.scrollHandle.bind(this), false);
-        },
-        unbindScroll: function() {
-            this.el.removeEventListener('scroll', this.scrollHandle.bind(this), false);
-        }
-    }
-
-    var container = document.querySelector('.scroll-w');
     var infinite = new InfiniteScroll({
         el: container,
         distance: 100,
         fn: function() {
-
             var self = this;
             self.lock = true;
-
             console.log('loading... ' + new Date());
             setTimeout(function() {
                 var d = document.createElement('div');
                 d.style.height = '100px';
                 d.innerHTML = +new Date();
-                container.appendChild(d);
+                app.appendChild(d);
                 console.log('end... ' + new Date());
                 self.lock = false
             }, 1000)
-
         }
-    })
+    });
+    infinite.init();
     </script>
 </body>
 

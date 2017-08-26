@@ -118,11 +118,10 @@
 
         var disabledExpr = element.getAttribute('infinite-scroll-disabled');
         var disabled = false;
-
-        if (disabledExpr) { // 处理: 一开始设置infinite-scroll-disabled为true,后来又修改为false时。需要添加watch根据infinite-scroll-immediate-check检测是否需要执行doCheck
+        if (disabledExpr) { // 处理: 需要添加watch根据infinite-scroll-immediate-check检测是否需要执行doCheck
             this.vm.$watch(disabledExpr, function(value) {
                 directive.disabled = value;
-                if (!value && directive.immediateCheck) { // 如果没有禁用,并且设置了初次检测时
+                if (!value && directive.immediateCheck) {    //处理需要自动撑开容器的情况,每次infinite-scroll-disabled变化都执行doCheck
                     // infinite-scroll-disabled == false && infinite-scroll-immediate-check == true
                     doCheck.call(directive);
                 }

@@ -1,67 +1,46 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <title>vue-infinite-scroll</title>
 </head>
 <body>
-<style>
-  *{
-    margin: 0;
-    padding: 0;
-  }
-  html,body,.scroll-w{
-    height: 800px;
-  }
-  .scroll-w{
-    background: #e2a4a4;
-    overflow: auto;
-  }
-  .app{
-      overflow: hidden;
-      background: #47c68c;
-      min-height: 100%;
-      width: 400px;
-      margin: 0 auto;
-  }
-  .app>div:nth-child(1){
-    margin-top: 750px;
-  }
-</style>
-<div class="scroll-w">
-<h1>无限滚动加载</h1>
-<div class="app"
-     v-infinite-scroll="loadMore"
-     infinite-scroll-immediate-check=false
-     infinite-scroll-disabled="busy"
-     infinite-scroll-distance="300">
-</div>
-</div>
-<script src="https://cdn.css.net/libs/vue/2.0.3/vue.js"></script>
-<script src="./vue-infinite-scroll.js"></script>
-<script>
+  <div class="app">
+    <ul v-infinite-scroll="loadMore" 
+    infinite-scroll-disabled="loading" 
+    infinite-scroll-distance="10">
+      <li v-for="item in list">{{ item }}</li>
+    </ul>
+  </div>
+  <script src="https://cdn.css.net/libs/vue/2.0.3/vue.js"></script>
+  <script src="./vue-infinite-scroll.js"></script>
+  <script>
   var app = document.querySelector('.app')
   new Vue({
     el: app,
-    data: function () {
-      return {busy: false}
+    data: function() {
+      return { 
+        loading: false,
+        list:[0,1,2,3,4,5,6,7]
+      }
     },
     methods: {
-      loadMore: function () {
-        var self = this;
-        self.busy = true;
-        console.log('loading... ' + new Date());
-        setTimeout(function () {
-          var d = document.createElement('div');
-          d.style.height='100px';
-          d.innerHTML = +new Date();
-          document.querySelector('.app').appendChild(d);
-          console.log('end... ' + new Date());
-          self.busy = false
-        }, 1000)
+      loadMore: function() {
+        this.loading = true;
+        console.log('loading start');
+        setTimeout(() => {
+          let last = this.list[this.list.length - 1];
+          for (let i = 1; i <= 10; i++) {
+            this.list.push(last + i);
+          }
+          this.loading = false;
+          console.log('loading end');
+        }, 2500);
       }
     }
   })
-</script>
+  </script>
 </body>
+
 </html>
