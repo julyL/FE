@@ -1,5 +1,5 @@
 
-// 假的二分查找
+// 假的二分查找 (不要求数组有序)
 function fn(arr,val){
 	var len=arr.length,
 		iseven=len%2==0;
@@ -15,10 +15,9 @@ function fn(arr,val){
 
 
 /*  
-	真二分查找
-	递归结束的条件：
-	   true: 找到
-	   false:  <arr[0] || >arr[len-1] 
+	递归结束的条件:
+	   true:   找到了
+	   false:  小于arr[0] || 大于arr[len-1] 
  */ 
 function fn1(arr,val){
 	var len=arr.length,
@@ -31,6 +30,26 @@ function fn1(arr,val){
 		}else{
 			return middle==len-1?false:fn1(arr.slice(middle,len-1),val);
 		}
+}
+
+/*
+	递归结束的条件:
+		1.找到了
+		2.数组长度为1,就直接返回return  arr[0]==val;
+*/ 
+function fn2(){
+	var len=arr.length,
+	middle=Math.floor(len/2);
+	if(len==1){
+		return arr[0]==val;
+	}
+	if(arr[middle]==val){
+		return true;
+	}else if(arr[middle]>val){
+		return fn1(arr.slice(0,middle),val);
+	}else {
+		return fn1(arr.slice(middle,len-1),val);
+	}
 }
 
 
