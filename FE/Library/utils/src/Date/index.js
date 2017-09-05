@@ -1,11 +1,15 @@
-import format from './format';
+import formatDate from './formatDate';
 import getDays from './getDays';
 import getDaysBetween from './getDaysBetween';
-import getDetail from './getDetail';
+import parseDate from './parseDate';
+import parseTime from './parseTime';
+import isLeapYear from './isLeapYear';
 
-export default {
-    format,
-    getDays,
-    getDaysBetween,
-    getDetail
+export default {  
+    formatDate,
+    getDays,		 
+    getDaysBetween,	 
+    parseDate,        
+    parseTime, 
+    isLeapYear       
 };

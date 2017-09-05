@@ -1,19 +1,21 @@
 /**
  * 返回date的各个信息
  * @param {date对象(或毫秒时间戳)} dat
- * getObject(new Date("2017/09/05"))
+ * parseDate(new Date("2017/09/05"))
 *   => {
+        year: 2017
+        month: 9,
         date: 5,
         day: 2,
+        second:0,
+        millisecond:0,
         longDayName: "Tuesday",
         longMonthName: "September",
-        month: 9,
         shortDayName: "Tue",
         shortMonthName: "Sep",
-        year: 2017
     }
 */
-function getDetails(dat) {
+function parseDate(dat) {
     var shortDayNames = [
             'Sun',
             'Mon',
@@ -66,6 +68,8 @@ function getDetails(dat) {
         day,
         hour,
         minute,
+        second,
+        millisecond,
         shortDayName,
         longDayName,
         shortMonthName,
@@ -83,10 +87,12 @@ function getDetails(dat) {
         day,
         hour: dat.getHours(),
         minute: dat.getMinutes(),
+        second:dat.getSeconds(),
+        millisecond:dat.getMilliseconds(),
         shortDayName: shortDayNames[day],
         longDayName: longDayNames[day],
         shortMonthName: shortMonthNames[month - 1],
         longMonthName: longMonthNames[month - 1]
     }
 }
-export default getDetails;
+export default parseDate;

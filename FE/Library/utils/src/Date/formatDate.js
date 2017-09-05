@@ -7,7 +7,7 @@ function leftpad(v){
     return v<10?'0'+v:v;
 }
 
-function format(time, formatStr) {
+function formatDate(time, formatStr) {
     //   yyyy-mm-dd HH:MM:SS   =>  2016-08-22 04:50:40
     //   yyyy年mm月dd日 HH时MM分SS秒  =>  2016年8月22日 05时50分40秒
     var date = new Date(time),
@@ -51,4 +51,4 @@ function format(time, formatStr) {
     }
     return formatStr;
 }
-export default format;
+export default formatDate;
