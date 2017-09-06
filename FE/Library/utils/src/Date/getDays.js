@@ -17,8 +17,7 @@ function getDays(yearOrdate, month) {
         return isLeapYear(y)
             ? 366
             : 365;
-    } else {
-        return new Date(y, m, 0).getDate();
     }
+    return new Date(y, m, 0).getDate();
 }
 export default getDays;

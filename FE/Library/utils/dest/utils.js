@@ -86,9 +86,8 @@ function getDays(yearOrdate, month) {
         m = yearOrdate.getMonth() + 1;
     } else if (!m) {
         return isLeapYear(y) ? 366 : 365;
-    } else {
-        return new Date(y, m, 0).getDate();
     }
+    return new Date(y, m, 0).getDate();
 }
 
 /**
@@ -169,27 +168,20 @@ var isDate = function (date) {
 };
 
 /**
- * 更加给定的毫秒数和基准时间返回 剩下的时间 (一般用于倒计时)
- * @param {毫秒数} ms
- * @param {作为基准的时间(默认为当前日期)} now
- * @param {最大的单位} maxUnit
- *
+ * 返回2者之间的时间差
+ * @param {起始日期} startDate 
+ * @param {终止日期} endDate 
  */
-function parseTime(ms, now, maxUnit) {
-    var now = now || new Date(),
-        stopDate = isDate(now) ? now : new Date(now),
-        stopDateObj = parseDate(stopDate),
-        endDate = stopDate.setMilliseconds(stopDateObj.millisecond - ms),
-        endDateObj = parseDate(endDate);
-    return {
-        year: stopDateObj.year - endDateObj.year,
-        month: stopDateObj.month - endDateObj.month,
-        day: stopDateObj.day - endDateObj.day,
-        hour: stopDateObj.hour - endDateObj.hour,
-        minute: stopDateObj.minute - endDateObj.minute,
-        second: stopDateObj.second - endDateObj.second,
-        millisecond: stopDateObj.millisecond - endDateObj.millisecond
-    };
+function countdown(startDate, endDate) {
+    var startDate = isDate(startDate) || new Date(startDate),
+        endDate = isDate(endDate) || new Date(endDate),
+        temp = (endDate - startDate) / 1000,
+        day = Math.floor(temp / 86400),
+        hour = Math.floor(temp % 86400 / 3600),
+        minute = Math.floor(temp % 3600 / 60),
+        second = Math.floor(temp % 60),
+        millisecond = Math.floor(temp);
+    return { day: day, hour: hour, minute: minute, second: second, millisecond: millisecond };
 }
 
 var Date$1 = {
@@ -197,14 +189,15 @@ var Date$1 = {
     getDays: getDays,
     getDaysBetween: getDaysBetween,
     parseDate: parseDate,
-    parseTime: parseTime,
+    countdown: countdown,
     isLeapYear: isLeapYear
 };
 
-var index = {
-    Date: Date$1
-};
+var utils;
+utils = Object.assign({}, Date$1);
 
-return index;
+var utils$1 = utils;
+
+return utils$1;
 
 })));

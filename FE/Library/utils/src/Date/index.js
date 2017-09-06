@@ -2,7 +2,7 @@ import formatDate from './formatDate';
 import getDays from './getDays';
 import getDaysBetween from './getDaysBetween';
 import parseDate from './parseDate';
-import parseTime from './parseTime';
+import countdown from './countdown';
 import isLeapYear from './isLeapYear';
 
 export default {  
@@ -10,6 +10,6 @@ export default {
     getDays,		 
     getDaysBetween,	 
     parseDate,        
-    parseTime, 
+    countdown, 
     isLeapYear       
 };

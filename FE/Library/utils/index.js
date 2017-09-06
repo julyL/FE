@@ -1,5 +1,6 @@
 import Date from "./src/Date/index.js";
 
-export default{
-    Date
-}
+var utils;
+utils=Object.assign({},Date)
+
+export default utils;
