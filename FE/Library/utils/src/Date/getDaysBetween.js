@@ -4,9 +4,9 @@
  * @param {增加的天数} days
  */
 function addDays(date, days) {
-    var dat = new Date(date.valueOf())
-    dat.setDate(dat.getDate() + days);
-    return dat;
+  var dat = new Date(date.valueOf());
+  dat.setDate(dat.getDate() + days);
+  return dat;
 }
 
 /**
@@ -17,12 +17,12 @@ function addDays(date, days) {
  * getDaysBetween(new Date("2004/02/28"),new Date("2004/03/02"))  => [Date对象("2004/02/28"),Date对象("2004/02/29"),Date对象("2004/03/01"),Date对象("2004/03/02")]
  */
 function getDaysBetween(startDate, stopDate) {
-    var dateArray = new Array();
-    var currentDate = startDate;
-    while (currentDate <= stopDate) {
-        dateArray.push(new Date(currentDate))
-        currentDate = addDays(currentDate, 1);
-    }
-    return dateArray;
+  var dateArray = new Array();
+  var currentDate = startDate;
+  while (currentDate <= stopDate) {
+    dateArray.push(new Date(currentDate));
+    currentDate = addDays(currentDate, 1);
+  }
+  return dateArray;
 }
 export default getDaysBetween;

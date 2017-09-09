@@ -1,13 +1,26 @@
-/**
- *
- * @param {处理的字符串} str
- * @param {用于补全的字符} ch
- * @param {补全的长度} len
- * leftpad(6,0) => "06"
- */
+// 技巧:  快速补全 Array(3).join("0") => "00"
 
-function leftpad(str, ch = "0", len = 1) {
-    str = String(str);
-    return Array(len + 1).join(ch) + str;
+/**
+ * 原版的left-pad模块
+ * @param {需要补全的字符串} str
+ * @param {补全后的长度} len
+ * @param {用于补全的字符} ch
+ * leftpad("6",2,0) = > "06"
+ */
+function leftpad(str, len, ch) {
+  str = String(str);
+
+  var i = -1;
+
+  if (!ch && ch !== 0) ch = " ";
+
+  len = len - str.length;
+
+  while (++i < len) {
+    str = ch + str;
+  }
+
+  return str;
 }
+
 export default leftpad;

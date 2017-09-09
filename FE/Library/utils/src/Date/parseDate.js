@@ -16,83 +16,75 @@
     }
 */
 function parseDate(dat) {
-    var shortDayNames = [
-            'Sun',
-            'Mon',
-            'Tue',
-            'Wed',
-            'Thu',
-            'Fri',
-            'Sat'
-        ],
-        longDayNames = [
-            'Sunday',
-            'Monday',
-            'Tuesday',
-            'Wednesday',
-            'Thursday',
-            'Friday',
-            'Saturday'
-        ],
-        shortMonthNames = [
-            'Jan',
-            'Feb',
-            'Mar',
-            'Apr',
-            'May',
-            'Jun',
-            'Jul',
-            'Aug',
-            'Sep',
-            'Oct',
-            'Nov',
-            'Dec'
-        ],
-        longMonthNames = [
-            'January',
-            'February',
-            'March',
-            'April',
-            'May',
-            'June',
-            'July',
-            'August',
-            'September',
-            'October',
-            'November',
-            'December'
-        ];
-    var year,
-        month,
-        date,
-        day,
-        hour,
-        minute,
-        second,
-        millisecond,
-        shortDayName,
-        longDayName,
-        shortMonthName,
-        longMonthName;
+  var shortDayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+    longDayNames = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday"
+    ],
+    shortMonthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec"
+    ],
+    longMonthNames = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ];
+  var year,
+    month,
+    date,
+    day,
+    hour,
+    minute,
+    second,
+    millisecond,
+    shortDayName,
+    longDayName,
+    shortMonthName,
+    longMonthName;
 
-    if (!(dat instanceof Date)) {
-        dat = new Date(dat);
-    }
-    month = dat.getMonth() + 1;
-    day = dat.getDay();
-    return {
-        year: dat.getFullYear(),
-        month,
-        date: dat.getDate(),
-        day,
-        hour: dat.getHours(),
-        minute: dat.getMinutes(),
-        second:dat.getSeconds(),
-        millisecond:dat.getMilliseconds(),
-        shortDayName: shortDayNames[day],
-        longDayName: longDayNames[day],
-        shortMonthName: shortMonthNames[month - 1],
-        longMonthName: longMonthNames[month - 1]
-    }
+  if (!(dat instanceof Date)) {
+    dat = new Date(dat);
+  }
+  month = dat.getMonth() + 1;
+  day = dat.getDay();
+  return {
+    year: dat.getFullYear(),
+    month,
+    date: dat.getDate(),
+    day,
+    hour: dat.getHours(),
+    minute: dat.getMinutes(),
+    second: dat.getSeconds(),
+    millisecond: dat.getMilliseconds(),
+    shortDayName: shortDayNames[day],
+    longDayName: longDayNames[day],
+    shortMonthName: shortMonthNames[month - 1],
+    longMonthName: longMonthNames[month - 1]
+  };
 }
 export default parseDate;

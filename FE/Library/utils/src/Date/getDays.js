@@ -6,18 +6,16 @@
  * getDays(2004,2) => 29
  * getDays(new Date("2004/02")) => 29
  */
-import isLeapYear from './isLeapYear';
+import isLeapYear from "./isLeapYear";
 function getDays(yearOrdate, month) {
-    var y = yearOrdate,
-        m = month;
-    if (yearOrdate instanceof Date) {
-        y = yearOrdate.getFullYear();
-        m = yearOrdate.getMonth() + 1;
-    } else if (!m) {
-        return isLeapYear(y)
-            ? 366
-            : 365;
-    }
-    return new Date(y, m, 0).getDate();
+  var y = yearOrdate,
+    m = month;
+  if (yearOrdate instanceof Date) {
+    y = yearOrdate.getFullYear();
+    m = yearOrdate.getMonth() + 1;
+  } else if (!m) {
+    return isLeapYear(y) ? 366 : 365;
+  }
+  return new Date(y, m, 0).getDate();
 }
 export default getDays;
