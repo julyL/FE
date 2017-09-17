@@ -1,6 +1,6 @@
 /*
-	使用 new Date("2015/05/04")进行格式化
-	new Date("2015-05-04") 会存在兼容性问题
+  YYYY-MM-DD hh:MM:SS   =>  2016-08-22 04:50:40
+  YYYY年MM月DD日 hh时MM分SS秒  =>  2016年8月22日 05时50分40秒
  */
 
 function leftpad(v) {
@@ -8,8 +8,6 @@ function leftpad(v) {
 }
 
 function formatDate(time, formatStr) {
-  //   yyyy-mm-dd HH:MM:SS   =>  2016-08-22 04:50:40
-  //   yyyy年mm月dd日 HH时MM分SS秒  =>  2016年8月22日 05时50分40秒
   var date = new Date(time),
     year = date.getFullYear(),
     month = date.getMonth() + 1,
@@ -19,32 +17,32 @@ function formatDate(time, formatStr) {
     second = date.getSeconds();
 
   var dateObj = {
-    yy: year,
-    y: String(year).slice(-2),
-    mm: leftpad(month),
-    m: month,
-    dd: leftpad(day),
-    d: day,
-    HH: leftpad(hour),
-    H: hour,
-    MM: leftpad(minute),
-    M: minute,
-    SS: leftpad(second),
-    S: second
+    YY: year,
+    Y: String(year).slice(-2),
+    MM: leftpad(month),
+    M: month,
+    DD: leftpad(day),
+    D: day,
+    hh: leftpad(hour),
+    h: hour,
+    mm: leftpad(minute),
+    m: minute,
+    ss: leftpad(second),
+    s: second
   };
   var regObj = {
-    yy: /yyyy/,
-    y: /yy/,
-    mm: /mm/,
-    m: /m/,
-    dd: /dd/,
-    d: /d/,
-    HH: /HH/,
-    H: /H/,
+    YY: /YYYY/,
+    Y: /YY/,
     MM: /MM/,
     M: /M/,
-    SS: /SS/,
-    S: /S/
+    DD: /DD/,
+    D: /D/,
+    hh: /hh/,
+    h: /h/,
+    mm: /mm/,
+    m: /m/,
+    ss: /ss/,
+    s: /s/
   };
   for (var i in regObj) {
     formatStr = formatStr.replace(regObj[i], dateObj[i]);

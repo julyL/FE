@@ -1,7 +1,7 @@
-// import * as Date from "./src/Date/index.js";
-// import {Date} from "./src/Date/index.js";
+import * as Tools from "./src/Tools/index.js";
+import * as date from "./src/Date/index.js";
 
 var utils;
-utils=Object.assign({},Date)
+utils = Object.assign({}, Tools, date);
 
 export default utils;

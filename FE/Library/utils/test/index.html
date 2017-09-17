@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<script src="../dest/utils.js"></script>
+<style>
+    .group {
+        overflow: hidden;
+        padding: 5px 20px;
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    i {
+        float: left;
+        padding-right: 20px;
+    }
+
+    .correct {
+        color: #47c68c;
+    }
+
+    .uncorrect {
+        color: #e88585;
+    }
+
+    .result {
+        padding: 10px 0 20px 100px;
+    }
+</style>
+
+<body>
+    <script>
+        function add(a, b) {
+            return a + b;
+        }
+        var body = document.body;
+        var test = function (needTest, shouldtobe) {
+            var con = document.createElement("div"),
+                result = shouldtobe ? it(needTest, shouldtobe) : it(needTest);
+            con.innerHTML = (result.equal ? "<i>√</i>" : "<i>×</i>") + result.html;
+            con.className = 'group';
+            con.classList.add(result.equal ? 'correct' : 'uncorrect');
+            body.appendChild(con);
+        }
+        var it = function (fn, shouldtobe) {
+            var r = eval("utils." + fn),
+                item = "<div class='it'>" + fn + "</div>  " +
+                "<div class='result'>=>&nbsp;&nbsp;&nbsp;&nbsp;" + (typeof r == 'object' ? format(r) : r) +
+                "</div>";
+            return {
+                html: item,
+                equal: arguments.length == 2 ? r == shouldtobe : true
+            };
+        }
+
+        function format(obj) {
+            var str = "{</br>";
+            for (var i in obj) {
+                if (obj.hasOwnProperty(i)) {
+                    str += "&nbsp;&nbsp;" + i + " : " + obj[i] + ",</br>"
+                }
+            }
+            return str + "}";
+        }
+    </script>
+    <script src='./test.js'></script>
+</body>
+
+</html>
