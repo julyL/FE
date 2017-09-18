@@ -1,7 +1,46 @@
-import * as Tools from "./src/Tools/index.js";
-import * as date from "./src/Date/index.js";
+import {
+  countdown,
+  formatDate,
+  getDays,
+  getDaysBetween,
+  isLeapYear,
+  parseDate
+} from "./src/date/index.js";
 
-var utils;
-utils = Object.assign({}, Tools, date);
+import {
+  addClass,
+  removeClass,
+  hasClass,
+  offset,
+  scrollTo
+} from "./src/dom/index.js";
 
-export default utils;
+import {
+  debounce,
+  leftpad,
+  throttle,
+  Url,
+  getValuebypath
+} from "./src/tools/index.js";
+
+export {
+  //Date
+  countdown,
+  formatDate,
+  getDays,
+  getDaysBetween,
+  isLeapYear,
+  parseDate,
+  //dom
+  // addClass,
+  // removeClass,
+  // hasClass,
+  // offset,
+  // scrollTo,
+  //Tools
+  debounce,
+  leftpad,
+  throttle,
+  Url,
+  getValuebypath
+};

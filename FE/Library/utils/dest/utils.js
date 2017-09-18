@@ -1,168 +1,15 @@
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-	typeof define === 'function' && define.amd ? define(factory) :
-	(global.utils = factory());
-}(this, (function () { 'use strict';
-
-// 自己的版本
-function debounce(func, wait, immediate) {
-  var timeout, args, context, timestamp, result;
-
-  var later = function later() {
-    var last = +new Date() - timestamp;
-
-    if (last < wait && last > 0) {
-      timeout = setTimeout(later, wait - last);
-    } else {
-      timeout = null;
-      if (!immediate) {
-        result = func.apply(context, args);
-        if (!timeout) context = args = null;
-      }
-    }
-  };
-
-  return function () {
-    context = this;
-    args = arguments;
-    timestamp = +new Date();
-    var callNow = immediate && !timeout;
-    if (!timeout) timeout = setTimeout(later, wait);
-    if (callNow) {
-      result = func.apply(context, args);
-      context = args = null;
-    }
-
-    return result;
-  };
-}
-
-// 技巧:  快速补全 Array(3).join("0") => "00"
-
-/**
- * 原版的left-pad模块
- * @param {需要补全的字符串} str
- * @param {补全后的长度} len
- * @param {用于补全的字符} ch
- * leftpad("6",2,0) = > "06"
- */
-function leftpad(str, len, ch) {
-  str = String(str);
-
-  var i = -1;
-
-  if (!ch && ch !== 0) ch = " ";
-
-  len = len - str.length;
-
-  while (++i < len) {
-    str = ch + str;
-  }
-
-  return str;
-}
-
-// 自己的版本   leading为真表示第一次立即执行,随后的执行wait之内只触发一次
-// 节流:   当频繁调用throttle(func,wait)时, wait时间之内只能执行一次func
-function throttle(func, wait, options) {
-  var context, args, result;
-  var timeout = null;
-  var previous = 0;
-  if (!options) options = {};
-  var later = function later() {
-    previous = options.leading === false ? 0 : +new Date();
-    timeout = null;
-    result = func.apply(context, args);
-    if (!timeout) context = args = null;
-  };
-  return function () {
-    var now = +new Date();
-    if (!previous && options.leading === false) previous = now;
-    var remaining = wait - (now - previous);
-    context = this;
-    args = arguments;
-    if (remaining <= 0 || remaining > wait) {
-      clearTimeout(timeout);
-      timeout = null;
-      previous = now;
-      result = func.apply(context, args);
-      if (!timeout) context = args = null;
-    } else if (!timeout && options.trailing !== false) {
-      //remaining ∈ (0,wait]
-      timeout = setTimeout(later, remaining);
-    }
-    return result;
-  };
-}
-
-var Url = function Url(url) {
-  if (!(this instanceof Url)) {
-    return new Url(url);
-  }
-  this.url = url || window.location.href;
-};
-Url.prototype = {
-  parse: function parse() {
-    var parser = document.createElement("a");
-    // http://example.com:3000/pathname/?search=test#hash
-    parser.href = this.url;
-    return {
-      protocol: parser.protocol, // => "http:"
-      hostname: parser.hostname, // => "example.com"
-      port: parser.port, // => "3000"
-      pathname: parser.pathname, // => "/pathname/"
-      search: parser.search, // => "?search=test"
-      hash: parser.hash, // => "#hash"
-      host: parser.host, // => "example.com:3000"
-      href: parser.href, // => "example.com:3000"
-      origin: parser.origin // => "example.com:3000"
-    };
-  },
-  get: function get(key) {
-    var params = this.parse().search.slice(1).split("&"),
-        temp;
-    for (var i = 0, len = params.length; i < len; i++) {
-      temp = params[i].split("=");
-      if (temp[0] == key) {
-        return decodeURIComponent(temp[1] || "");
-      }
-    }
-  },
-  set: function set(key, val) {
-    var url = this.parse(),
-        params = url.search.slice(1).split("&"),
-        temp,
-        index;
-    for (var i = 0, len = params.length; i < len; i++) {
-      temp = params[i].split("=");
-      if (temp[0] == key) {
-        index = i;
-        break;
-      }
-    }
-    if (index) {
-      params[index] = key + "=" + decodeURIComponent(val);
-      this.url = url.origin + url.pathname + "?" + params.join("&");
-    }
-    return this.url;
-  }
-};
-
-
-
-var Tools = Object.freeze({
-	debounce: debounce,
-	leftpad: leftpad,
-	throttle: throttle,
-	Url: Url
-});
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.utils = {})));
+}(this, (function (exports) { 'use strict';
 
 /*
   YYYY-MM-DD hh:MM:SS   =>  2016-08-22 04:50:40
   YYYY年MM月DD日 hh时MM分SS秒  =>  2016年8月22日 05时50分40秒
  */
 
-function leftpad$2(v) {
+function leftpad(v) {
   return v < 10 ? "0" + v : v;
 }
 
@@ -178,15 +25,15 @@ function formatDate(time, formatStr) {
   var dateObj = {
     YY: year,
     Y: String(year).slice(-2),
-    MM: leftpad$2(month),
+    MM: leftpad(month),
     M: month,
-    DD: leftpad$2(day),
+    DD: leftpad(day),
     D: day,
-    hh: leftpad$2(hour),
+    hh: leftpad(hour),
     h: hour,
-    mm: leftpad$2(minute),
+    mm: leftpad(minute),
     m: minute,
-    ss: leftpad$2(second),
+    ss: leftpad(second),
     s: second
   };
   var regObj = {
@@ -325,7 +172,7 @@ function parseDate(dat) {
     millisecond : 6
   }
 */
-function leftpad$3(v) {
+function leftpad$1(v) {
   return v < 10 ? "0" + v : v;
 }
 function countdown(startDate, endDate, formatStr) {
@@ -341,13 +188,13 @@ function countdown(startDate, endDate, formatStr) {
       millisecond = Math.floor((endDate - startDate) % 1000);
 
   var dateObj = {
-    DD: leftpad$3(day),
+    DD: leftpad$1(day),
     D: day,
-    hh: leftpad$3(hour),
+    hh: leftpad$1(hour),
     h: hour,
-    mm: leftpad$3(minute),
+    mm: leftpad$1(minute),
     m: minute,
-    ss: leftpad$3(second),
+    ss: leftpad$1(second),
     s: second
   };
   var regObj = {
@@ -369,22 +216,276 @@ function countdown(startDate, endDate, formatStr) {
   }
 }
 
+/**
+ * 
+ * @param {需要处理的字符串} str 
+ * @param {是否去掉多余的空格(有多个空格时,只保留一个空格)} replaceall 
+ */
 
+(function () {
+  var lastTime = 0;
+  var vendors = ["webkit", "moz"];
+  for (var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+    window.requestAnimationFrame = window[vendors[x] + "RequestAnimationFrame"];
+    window.cancelAnimationFrame = window[vendors[x] + "CancelAnimationFrame"] || // Webkit中此取消方法的名字变了
+    window[vendors[x] + "CancelRequestAnimationFrame"];
+  }
 
-var date = Object.freeze({
-	countdown: countdown,
-	formatDate: formatDate,
-	getDays: getDays,
-	getDaysBetween: getDaysBetween,
-	isLeapYear: isLeapYear,
-	parseDate: parseDate
-});
+  if (!window.requestAnimationFrame) {
+    window.requestAnimationFrame = function (callback, element) {
+      var currTime = new Date().getTime();
+      var timeToCall = Math.max(0, 16.7 - (currTime - lastTime));
+      var id = window.setTimeout(function () {
+        callback(currTime + timeToCall);
+      }, timeToCall);
+      lastTime = currTime + timeToCall;
+      return id;
+    };
+  }
+  if (!window.cancelAnimationFrame) {
+    window.cancelAnimationFrame = function (id) {
+      clearTimeout(id);
+    };
+  }
+})();
 
-var utils;
-utils = Object.assign({}, Tools, date);
+// 自己的版本
+/** underscore版本
 
-var utils$1 = utils;
+debounce(function, wait, [immediate])
+返回 function 函数的防抖版本, 将延迟函数的执行(真正的执行)在函数最后一次调用时刻的 wait 毫秒之后.
+传参 immediate 为 true， debounce会在 wait 时间间隔的开始调用这个函数 。（注：并且在 wait 的时间之内，不会再次调用。）
 
-return utils$1;
+debounce(func,wait)
+debounce(func,wait,true)
+ */
+
+function debounce(func, wait, immediate) {
+  var timeout, args, context, timestamp, result;
+
+  var later = function later() {
+    var last = +new Date() - timestamp;
+
+    if (last < wait && last > 0) {
+      timeout = setTimeout(later, wait - last);
+    } else {
+      timeout = null;
+      if (!immediate) {
+        result = func.apply(context, args);
+        if (!timeout) context = args = null;
+      }
+    }
+  };
+
+  return function () {
+    context = this;
+    args = arguments;
+    timestamp = +new Date();
+    var callNow = immediate && !timeout;
+    if (!timeout) timeout = setTimeout(later, wait);
+    if (callNow) {
+      result = func.apply(context, args);
+      context = args = null;
+    }
+
+    return result;
+  };
+}
+
+// 技巧:  快速补全 Array(3).join("0") => "00"
+
+/**
+ * 原版的left-pad模块
+ * @param {需要补全的字符串} str
+ * @param {补全后的长度} len
+ * @param {用于补全的字符} ch
+ * leftpad("6",2,0) = > "06"
+ */
+function leftpad$2(str, len, ch) {
+  str = String(str);
+
+  var i = -1;
+
+  if (!ch && ch !== 0) ch = " ";
+
+  len = len - str.length;
+
+  while (++i < len) {
+    str = ch + str;
+  }
+
+  return str;
+}
+
+// 自己的版本   leading为真表示第一次立即执行,随后的执行wait之内只触发一次
+// 节流:   当频繁调用throttle(func,wait)时, wait时间之内只能执行一次func
+/**
+
+以下为underscore版本
+
+创建并返回一个像节流阀一样的函数，当重复调用函数的时候，最多每隔 wait毫秒调用一次该函数。
+默认情况下，throttle将在你调用的第一时间尽快执行这个function，并且，如果你在wait周期内调用任意次数的函数，都将尽快的被覆盖。
+
+禁用第一次首先执行，设置{leading: false}
+禁用最后一次执行，设置{trailing: false}
+
+ throttle(fn,wait)
+ throttle(fn,wait,{leading:false})
+ throttle(fn,wait,{trailing:false})
+
+ throttle(fn,wait,{leading:false,trailing:false})  
+ 错误调用: fn不会执行    remaining === wait && options.trailing === false
+
+ */
+function throttle(func, wait, options) {
+  var context, args, result;
+  var timeout = null;
+  var previous = 0;
+  if (!options) options = {};
+  var later = function later() {
+    previous = options.leading === false ? 0 : +new Date();
+    timeout = null;
+    result = func.apply(context, args);
+    if (!timeout) context = args = null;
+  };
+  return function () {
+    var now = +new Date();
+    if (!previous && options.leading === false) previous = now;
+    var remaining = wait - (now - previous);
+    context = this;
+    args = arguments;
+    if (remaining <= 0 || remaining > wait) {
+      clearTimeout(timeout);
+      timeout = null;
+      previous = now;
+      result = func.apply(context, args);
+      if (!timeout) context = args = null;
+    } else if (!timeout && options.trailing !== false) {
+      //remaining ∈ (0,wait]
+      timeout = setTimeout(later, remaining);
+    }
+    return result;
+  };
+}
+
+var Url = function Url(url) {
+  if (!(this instanceof Url)) {
+    return new Url(url);
+  }
+  this.url = url || window.location.href;
+};
+Url.prototype = {
+  parse: function parse() {
+    var parser = document.createElement("a");
+    // http://example.com:3000/pathname/?search=test#hash
+    parser.href = this.url;
+    return {
+      protocol: parser.protocol, // => "http:"
+      hostname: parser.hostname, // => "example.com"
+      port: parser.port, // => "3000"
+      pathname: parser.pathname, // => "/pathname/"
+      search: parser.search, // => "?search=test"
+      hash: parser.hash, // => "#hash"
+      host: parser.host, // => "example.com:3000"
+      href: parser.href, // => "example.com:3000"
+      origin: parser.origin // => "example.com:3000"
+    };
+  },
+  get: function get(key) {
+    var params = this.parse().search.slice(1).split("&"),
+        temp;
+    for (var i = 0, len = params.length; i < len; i++) {
+      temp = params[i].split("=");
+      if (temp[0] == key) {
+        return decodeURIComponent(temp[1] || "");
+      }
+    }
+  },
+  set: function set(key, val) {
+    var url = this.parse(),
+        params = url.search.slice(1).split("&"),
+        temp,
+        index;
+    for (var i = 0, len = params.length; i < len; i++) {
+      temp = params[i].split("=");
+      if (temp[0] == key) {
+        index = i;
+        break;
+      }
+    }
+    if (index) {
+      params[index] = key + "=" + decodeURIComponent(val);
+      this.url = url.origin + url.pathname + "?" + params.join("&");
+    }
+    return this.url;
+  },
+  remove: function remove(key) {
+    var url = this.parse(),
+        params = url.search.slice(1).split("&"),
+        temp,
+        index;
+    for (var i = 0, len = params.length; i < len; i++) {
+      temp = params[i].split("=");
+      if (temp[0] == key) {
+        index = i;
+        break;
+      }
+    }
+    this.url = url.origin + url.pathname + "?" + params.splice(index, -1).join("&");
+  }
+};
+
+/**
+ * 不知道对象结构时取值时,一般会采用 obj&&obj[0]&&obj.name的方法,等价于下面的方法
+ *  f(obj,'[0].name') === f(obj,['0','name'])
+ * @param {取值的对象} obj 
+ * @param {用于取值的字符串或者数组} path 
+ * var testData = {
+    a: [
+            {
+                c: {
+                    b: [233]
+                }
+            }
+        ]
+    };
+    getValuebypath(testData,'a[0].c.b[0]') => 233
+    getValuebypath(testData,['a','0','c','b','0']) => 233
+ */
+function getValuebypath(obj, path) {
+  if (Array.isArray(path)) {
+    return path.reduce(function (ob, k) {
+      return ob && ob[k] ? ob[k] : null;
+    }, obj);
+  } else if (typeof path == "string") {
+    var arrKeys = path.split("."),
+        keys = [],
+        m;
+    arrKeys.forEach(function (k) {
+      if (m = k.match(/([^\[\]]+)|(\[\d+\])/g)) {
+        // arr[3][2] =>  ['arr',3,2]
+        m = m.map(function (v) {
+          return v.replace(/\[(\d+)\]/, "$1");
+        }); // [2] => 2
+        [].push.apply(keys, m);
+      }
+    });
+    return getValuebypath(obj, keys);
+  }
+}
+
+exports.countdown = countdown;
+exports.formatDate = formatDate;
+exports.getDays = getDays;
+exports.getDaysBetween = getDaysBetween;
+exports.isLeapYear = isLeapYear;
+exports.parseDate = parseDate;
+exports.debounce = debounce;
+exports.leftpad = leftpad$2;
+exports.throttle = throttle;
+exports.Url = Url;
+exports.getValuebypath = getValuebypath;
+
+Object.defineProperty(exports, '__esModule', { value: true });
 
 })));

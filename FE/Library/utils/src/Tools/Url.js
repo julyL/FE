@@ -50,6 +50,21 @@ Url.prototype = {
       this.url = url.origin + url.pathname + "?" + params.join("&");
     }
     return this.url;
+  },
+  remove(key) {
+    var url = this.parse(),
+      params = url.search.slice(1).split("&"),
+      temp,
+      index;
+    for (var i = 0, len = params.length; i < len; i++) {
+      temp = params[i].split("=");
+      if (temp[0] == key) {
+        index = i;
+        break;
+      }
+    }
+    this.url =
+      url.origin + url.pathname + "?" + params.splice(index, -1).join("&");
   }
 };
 export default Url;

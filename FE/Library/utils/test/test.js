@@ -24,3 +24,16 @@ test("Url('https://www.baidu.com/?a=a%3D2&b=33#hash').parse()");
 test("Url('https://www.baidu.com/?a=a%3D2&b=33#hash').get('a')");
 
 test("Url('https://www.baidu.com/?a=a%3D2&b=33#hash').set('b',44)");
+
+var testData = {
+  a: [
+    {
+      c: {
+        b: [233]
+      }
+    }
+  ]
+};
+test("getValuebypath(testData,'a[0].c.b[0]')");
+
+test("getValuebypath(testData,['a','0','c','b','0'])");
