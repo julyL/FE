@@ -161,17 +161,6 @@ function parseDate(dat) {
   };
 }
 
-/*
-  获取2个时间之内剩余的时间(天,小时等) 一般用于倒计时 
-  countdown(3666006)
-   => {
-    day : 0,
-    hour : 1,
-    minute : 1,
-    second : 6,
-    millisecond : 6
-  }
-*/
 function leftpad$1(v) {
   return v < 10 ? "0" + v : v;
 }
@@ -216,11 +205,60 @@ function countdown(startDate, endDate, formatStr) {
   }
 }
 
+function isElement(node) {
+  if (!node || node.nodeType !== 1) {
+    return false;
+  }
+  return true;
+}
+
 /**
  * 
  * @param {需要处理的字符串} str 
  * @param {是否去掉多余的空格(有多个空格时,只保留一个空格)} replaceall 
  */
+function trim(str, replaceall) {
+  if (replaceall) {
+    return str.replace(/^\s*|\s*$/g, "").replace(/\s+/g, " ");
+  } else {
+    return str.replace(/^\s*|\s*$/g, "");
+  }
+}
+
+function hasClass(el, className) {
+  var classNameArrays = trim(el.className, true).split(" ");
+  return classNameArrays.indexOf(className) != -1 ? true : false;
+}
+
+function addClass(el, className) {
+  el = isElement(el) ? el : document.querySelector(el);
+  if (el.classList) {
+    el.classList.add(className);
+  } else {
+    if (!hasClass(el, className)) {
+      el.className += " " + className;
+    }
+  }
+}
+
+function removeClass(el, className) {
+  el = isElement(el) ? el : document.querySelector(el);
+  if (el.classList) {
+    el.classList.remove(className);
+  } else {
+    el.className = el.className.replace(new RegExp("\\s*" + className + "\\s*"), "");
+  }
+}
+
+function offset(el) {
+  var obj = el.getBoundingClientRect();
+  return {
+    left: obj.left + window.pageXOffset,
+    top: obj.top + window.pageYOffset,
+    width: obj.width,
+    height: obj.height
+  };
+}
 
 (function () {
   var lastTime = 0;
@@ -249,17 +287,31 @@ function countdown(startDate, endDate, formatStr) {
   }
 })();
 
+function scrollTo(el) {
+  var to = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+  var time = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 300;
+
+  if (typeof el == "string") {
+    el = document.querySelector(el);
+  }
+  var scrollTop = el.scrollTop,
+      distance = scrollTop - to,
+      move = distance / (time / 16.7);
+  (function scroll() {
+    var timer = requestAnimationFrame(function () {
+      if (distance > 0 && el.scrollTop - move <= to || distance < 0 && el.scrollTop - move >= to) {
+        el.scrollTop = to;
+      } else {
+        el.scrollTop -= move;
+        scroll();
+      }
+      cancelAnimationFrame(timer);
+      timer = null;
+    });
+  })();
+}
+
 // 自己的版本
-/** underscore版本
-
-debounce(function, wait, [immediate])
-返回 function 函数的防抖版本, 将延迟函数的执行(真正的执行)在函数最后一次调用时刻的 wait 毫秒之后.
-传参 immediate 为 true， debounce会在 wait 时间间隔的开始调用这个函数 。（注：并且在 wait 的时间之内，不会再次调用。）
-
-debounce(func,wait)
-debounce(func,wait,true)
- */
-
 function debounce(func, wait, immediate) {
   var timeout, args, context, timestamp, result;
 
@@ -319,24 +371,6 @@ function leftpad$2(str, len, ch) {
 
 // 自己的版本   leading为真表示第一次立即执行,随后的执行wait之内只触发一次
 // 节流:   当频繁调用throttle(func,wait)时, wait时间之内只能执行一次func
-/**
-
-以下为underscore版本
-
-创建并返回一个像节流阀一样的函数，当重复调用函数的时候，最多每隔 wait毫秒调用一次该函数。
-默认情况下，throttle将在你调用的第一时间尽快执行这个function，并且，如果你在wait周期内调用任意次数的函数，都将尽快的被覆盖。
-
-禁用第一次首先执行，设置{leading: false}
-禁用最后一次执行，设置{trailing: false}
-
- throttle(fn,wait)
- throttle(fn,wait,{leading:false})
- throttle(fn,wait,{trailing:false})
-
- throttle(fn,wait,{leading:false,trailing:false})  
- 错误调用: fn不会执行    remaining === wait && options.trailing === false
-
- */
 function throttle(func, wait, options) {
   var context, args, result;
   var timeout = null;
@@ -440,22 +474,14 @@ Url.prototype = {
  *  f(obj,'[0].name') === f(obj,['0','name'])
  * @param {取值的对象} obj 
  * @param {用于取值的字符串或者数组} path 
- * var testData = {
-    a: [
-            {
-                c: {
-                    b: [233]
-                }
-            }
-        ]
-    };
-    getValuebypath(testData,'a[0].c.b[0]') => 233
-    getValuebypath(testData,['a','0','c','b','0']) => 233
+    var testData = { a: [{ c: { b: [233] } }] };
+    safeGet(testData,'a[0].c.b[0]') => 233
+    safeGet(testData,['a','0','c','b','0']) => 233
  */
-function getValuebypath(obj, path) {
+function safeGet(obj, path) {
   if (Array.isArray(path)) {
     return path.reduce(function (ob, k) {
-      return ob && ob[k] ? ob[k] : null;
+      return ob && ob[k] ? ob[k] : undefined;
     }, obj);
   } else if (typeof path == "string") {
     var arrKeys = path.split("."),
@@ -463,15 +489,158 @@ function getValuebypath(obj, path) {
         m;
     arrKeys.forEach(function (k) {
       if (m = k.match(/([^\[\]]+)|(\[\d+\])/g)) {
-        // arr[3][2] =>  ['arr',3,2]
+        // arr[3][2] =>  ['arr',[3],[2]]
         m = m.map(function (v) {
           return v.replace(/\[(\d+)\]/, "$1");
-        }); // [2] => 2
+        });
+        // ['arr',[3],[2]] => ['arr','3','2']
         [].push.apply(keys, m);
       }
     });
-    return getValuebypath(obj, keys);
+    return safeGet(obj, keys);
   }
+}
+
+/*
+    依赖: Promise
+    简单的依赖加载处理
+    asyncLoadJS(['a.js', 'b.js']).then(() => console.log('all done'));
+*/
+
+function exec(src) {
+  var script = document.createElement("script");
+  script.src = src;
+
+  // 返回一个独立的promise
+  return new Promise(function (resolve, reject) {
+    var done = false;
+
+    script.onload = script.onreadystatechange = function () {
+      if (!done && (!script.readyState || script.readyState === "loaded" || script.readyState === "complete")) {
+        done = true;
+
+        // 避免内存泄漏
+        script.onload = script.onreadystatechange = null;
+        resolve(script);
+      }
+    };
+
+    script.onerror = reject;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  });
+}
+
+function asyncLoadJs(dependencies) {
+  return Promise.all(dependencies.map(exec));
+}
+
+/**
+*  Base64 encode / decode
+*  @author haitao.tu
+*  @date   2010-04-26
+*  @email  tuhaitao@foxmail.com
+
+  useage:
+    Base64(124中文内容);   =>  MTI05Lit5paH5YaF5a65
+    Base64.encode("124中文内容");    =>  "MTI05Lit5paH5YaF5a65"
+    Base64.decode("MTI05Lit5paH5YaF5a65");  => 124中文内容
+ */
+var _keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+function Base64(strForEncode) {
+  return Base64.encode(strForEncode);
+}
+Base64.encode = function (input) {
+  var output = "";
+  var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
+  var i = 0;
+  input = _utf8_encode(input);
+  while (i < input.length) {
+    chr1 = input.charCodeAt(i++);
+    chr2 = input.charCodeAt(i++);
+    chr3 = input.charCodeAt(i++);
+    enc1 = chr1 >> 2;
+    enc2 = (chr1 & 3) << 4 | chr2 >> 4;
+    enc3 = (chr2 & 15) << 2 | chr3 >> 6;
+    enc4 = chr3 & 63;
+    if (isNaN(chr2)) {
+      enc3 = enc4 = 64;
+    } else if (isNaN(chr3)) {
+      enc4 = 64;
+    }
+    output = output + _keyStr.charAt(enc1) + _keyStr.charAt(enc2) + _keyStr.charAt(enc3) + _keyStr.charAt(enc4);
+  }
+  return output;
+};
+Base64.decode = function (input) {
+  var output = "";
+  var chr1, chr2, chr3;
+  var enc1, enc2, enc3, enc4;
+  var i = 0;
+  input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+  while (i < input.length) {
+    enc1 = _keyStr.indexOf(input.charAt(i++));
+    enc2 = _keyStr.indexOf(input.charAt(i++));
+    enc3 = _keyStr.indexOf(input.charAt(i++));
+    enc4 = _keyStr.indexOf(input.charAt(i++));
+    chr1 = enc1 << 2 | enc2 >> 4;
+    chr2 = (enc2 & 15) << 4 | enc3 >> 2;
+    chr3 = (enc3 & 3) << 6 | enc4;
+    output = output + String.fromCharCode(chr1);
+    if (enc3 != 64) {
+      output = output + String.fromCharCode(chr2);
+    }
+    if (enc4 != 64) {
+      output = output + String.fromCharCode(chr3);
+    }
+  }
+  output = _utf8_decode(output);
+  return output;
+};
+
+function _utf8_encode(string) {
+  string = string.replace(/\r\n/g, "\n");
+  var utftext = "";
+  for (var n = 0; n < string.length; n++) {
+    var c = string.charCodeAt(n);
+    if (c < 128) {
+      utftext += String.fromCharCode(c);
+    } else if (c > 127 && c < 2048) {
+      utftext += String.fromCharCode(c >> 6 | 192);
+      utftext += String.fromCharCode(c & 63 | 128);
+    } else {
+      utftext += String.fromCharCode(c >> 12 | 224);
+      utftext += String.fromCharCode(c >> 6 & 63 | 128);
+      utftext += String.fromCharCode(c & 63 | 128);
+    }
+  }
+  return utftext;
+}
+
+// private method for UTF-8 decoding
+function _utf8_decode(utftext) {
+  var string = "";
+  var i = 0,
+      c = 0,
+      c1 = 0,
+      c2 = 0,
+      c3;
+  while (i < utftext.length) {
+    c = utftext.charCodeAt(i);
+    if (c < 128) {
+      string += String.fromCharCode(c);
+      i++;
+    } else if (c > 191 && c < 224) {
+      c2 = utftext.charCodeAt(i + 1);
+      string += String.fromCharCode((c & 31) << 6 | c2 & 63);
+      i += 2;
+    } else {
+      c2 = utftext.charCodeAt(i + 1);
+      c3 = utftext.charCodeAt(i + 2);
+      string += String.fromCharCode((c & 15) << 12 | (c2 & 63) << 6 | c3 & 63);
+      i += 3;
+    }
+  }
+  return string;
 }
 
 exports.countdown = countdown;
@@ -480,11 +649,18 @@ exports.getDays = getDays;
 exports.getDaysBetween = getDaysBetween;
 exports.isLeapYear = isLeapYear;
 exports.parseDate = parseDate;
+exports.addClass = addClass;
+exports.removeClass = removeClass;
+exports.hasClass = hasClass;
+exports.offset = offset;
+exports.scrollTo = scrollTo;
 exports.debounce = debounce;
 exports.leftpad = leftpad$2;
 exports.throttle = throttle;
 exports.Url = Url;
-exports.getValuebypath = getValuebypath;
+exports.safeGet = safeGet;
+exports.asyncLoadJs = asyncLoadJs;
+exports.Base64 = Base64;
 
 Object.defineProperty(exports, '__esModule', { value: true });
 

@@ -25,15 +25,13 @@ test("Url('https://www.baidu.com/?a=a%3D2&b=33#hash').get('a')");
 
 test("Url('https://www.baidu.com/?a=a%3D2&b=33#hash').set('b',44)");
 
-var testData = {
-  a: [
-    {
-      c: {
-        b: [233]
-      }
-    }
-  ]
-};
-test("getValuebypath(testData,'a[0].c.b[0]')");
+var testData = { a: [{ c: { b: [233] } }] };
+test("safeGet(testData,'a[0].c.b[0]')");
 
-test("getValuebypath(testData,['a','0','c','b','0'])");
+test("safeGet(testData,['a','0','c','b','0'])");
+
+test("Base64('base64编码的内容')");
+
+test("Base64.encode('base64编码的内容')");
+
+test("Base64.decode('YmFzZTY057yW56CB55qE5YaF5a65')==='base64编码的内容'");

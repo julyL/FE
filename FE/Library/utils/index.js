@@ -20,7 +20,9 @@ import {
   leftpad,
   throttle,
   Url,
-  getValuebypath
+  safeGet,
+  asyncLoadJs,
+  Base64
 } from "./src/tools/index.js";
 
 export {
@@ -32,15 +34,19 @@ export {
   isLeapYear,
   parseDate,
   //dom
-  // addClass,
-  // removeClass,
-  // hasClass,
-  // offset,
-  // scrollTo,
+
+  addClass,
+  removeClass,
+  hasClass,
+  offset,
+  scrollTo,
   //Tools
+
   debounce,
   leftpad,
   throttle,
   Url,
-  getValuebypath
+  safeGet,
+  asyncLoadJs,
+  Base64
 };

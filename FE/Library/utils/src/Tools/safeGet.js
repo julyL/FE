@@ -3,22 +3,14 @@
  *  f(obj,'[0].name') === f(obj,['0','name'])
  * @param {取值的对象} obj 
  * @param {用于取值的字符串或者数组} path 
- * var testData = {
-    a: [
-            {
-                c: {
-                    b: [233]
-                }
-            }
-        ]
-    };
-    getValuebypath(testData,'a[0].c.b[0]') => 233
-    getValuebypath(testData,['a','0','c','b','0']) => 233
+    var testData = { a: [{ c: { b: [233] } }] };
+    safeGet(testData,'a[0].c.b[0]') => 233
+    safeGet(testData,['a','0','c','b','0']) => 233
  */
-function getValuebypath(obj, path) {
+function safeGet(obj, path) {
   if (Array.isArray(path)) {
     return path.reduce((ob, k) => {
-      return ob && ob[k] ? ob[k] : null;
+      return ob && ob[k] ? ob[k] : undefined;
     }, obj);
   } else if (typeof path == "string") {
     var arrKeys = path.split("."),
@@ -26,12 +18,13 @@ function getValuebypath(obj, path) {
       m;
     arrKeys.forEach(k => {
       if ((m = k.match(/([^\[\]]+)|(\[\d+\])/g))) {
-        // arr[3][2] =>  ['arr',3,2]
-        m = m.map(v => v.replace(/\[(\d+)\]/, "$1")); // [2] => 2
+        // arr[3][2] =>  ['arr',[3],[2]]
+        m = m.map(v => v.replace(/\[(\d+)\]/, "$1"));
+        // ['arr',[3],[2]] => ['arr','3','2']
         [].push.apply(keys, m);
       }
     });
-    return getValuebypath(obj, keys);
+    return safeGet(obj, keys);
   }
 }
-export default getValuebypath;
+export default safeGet;

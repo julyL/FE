@@ -5,7 +5,7 @@
  */
 function trim(str, replaceall) {
   if (replaceall) {
-    return str.replace(/^\s*|\s*$/g, "").replace(/\s+/, " ");
+    return str.replace(/^\s*|\s*$/g, "").replace(/\s+/g, " ");
   } else {
     return str.replace(/^\s*|\s*$/g, "");
   }
