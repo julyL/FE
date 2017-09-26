@@ -1,4 +1,4 @@
-import trim from "../tools/trim.js";
+import trim from "./trim.js";
 function hasClass(el, className) {
   var classNameArrays = trim(el.className, true).split(" ");
   return classNameArrays.indexOf(className) != -1 ? true : false;

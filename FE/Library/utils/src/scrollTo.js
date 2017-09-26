@@ -1,4 +1,4 @@
-import "../polyfill/requestAnimationFrame.js";
+import "./requestAnimationFrame.js";
 /**
  * 
  * @param {需要滚动的元素} el 

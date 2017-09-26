@@ -1,4 +1,4 @@
-import isDate from "../is/isDate";
+import isDate from "./isDate";
 
 /*
   获取2个时间之内剩余的时间(天,小时等) 一般用于倒计时 

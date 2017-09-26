@@ -1,47 +1,34 @@
-import {
-  countdown,
-  formatDate,
-  getDays,
-  getDaysBetween,
-  isLeapYear,
-  parseDate
-} from "./src/date/index.js";
-
-import {
-  addClass,
-  removeClass,
-  hasClass,
-  offset,
-  scrollTo
-} from "./src/dom/index.js";
-
-import {
-  debounce,
-  leftpad,
-  throttle,
-  Url,
-  safeGet,
-  asyncLoadJs,
-  Base64
-} from "./src/tools/index.js";
+import countdown from "./countdown";
+import formatDate from "./formatDate";
+import getDays from "./getDays";
+import getDaysBetween from "./getDaysBetween";
+import isLeapYear from "./isLeapYear";
+import parseDate from "./parseDate";
+import addClass from "./addClass";
+import removeClass from "./removeClass";
+import hasClass from "./hasClass";
+import offset from "./offset";
+import scrollTo from "./scrollTo";
+import debounce from "./debounce";
+import leftpad from "./leftpad";
+import throttle from "./throttle";
+import Url from "./Url";
+import safeGet from "./safeGet";
+import asyncLoadJs from "./asyncLoadJs";
+import Base64 from "./Base64";
 
 export {
-  //Date
   countdown,
   formatDate,
   getDays,
   getDaysBetween,
   isLeapYear,
   parseDate,
-  //dom
-
   addClass,
   removeClass,
   hasClass,
   offset,
   scrollTo,
-  //Tools
-
   debounce,
   leftpad,
   throttle,
