@@ -1,4 +1,4 @@
-import isElement from "../is/isElement.js";
+import isElement from "./isElement.js";
 function removeClass(el, className) {
   el = isElement(el) ? el : document.querySelector(el);
   if (el.classList) {

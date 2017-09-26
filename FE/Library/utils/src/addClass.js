@@ -1,4 +1,4 @@
-import isElement from "../is/isElement.js";
+import isElement from "./isElement.js";
 import hasClass from "./hasClass.js";
 function addClass(el, className) {
   el = isElement(el) ? el : document.querySelector(el);
