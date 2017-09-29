@@ -50,7 +50,7 @@
         var it = function (fn, shouldtobe) {
             var r = eval("utils." + fn),
                 item = "<div class='it'>" + fn + "</div>  " +
-                "<div class='result'>=>&nbsp;&nbsp;&nbsp;&nbsp;" + (typeof r == 'object' ? format(r) : r) +
+                "<div class='result'>=>" + addSpace(4) + (typeof r == 'object' ? format(r) : r) +
                 "</div>";
             return {
                 html: item,
@@ -58,14 +58,40 @@
             };
         }
 
-        function format(obj) {
-            var str = "{</br>";
+        function addSpace(num) {
+            var i = 0,
+                space = '';
+            while (i < num) {
+                i++;
+                space += "&nbsp;&nbsp;"
+            }
+            return space;
+        }
+
+        function format(obj, zindex) {
+            var str = "",
+                objStr,
+                zindex = zindex || 1,
+                temp = zindex;
             for (var i in obj) {
                 if (obj.hasOwnProperty(i)) {
-                    str += "&nbsp;&nbsp;" + i + " : " + obj[i] + ",</br>"
+                    if (typeof obj[i] == 'object') {
+                        objStr = format(obj[i], ++zindex);
+                    } else {
+                        objStr = obj[i];
+                    }
+                    str += addSpace(zindex) + i + " : " + objStr + ",</br>"
+                    str = str.replace(/,<\/br>$/, '</br>');
                 }
             }
-            return str + "}";
+            if (typeof obj == 'object') {
+                if (Array.isArray(obj)) {
+                    str = "[" + str + addSpace(zindex) + "]";
+                } else {
+                    str = "{</br>" + str + addSpace(temp) + "}";
+                }
+            }
+            return str;
         }
     </script>
     <script src='./test.js'></script>

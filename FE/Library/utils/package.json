@@ -9,7 +9,7 @@
     "dev": "rollup -c --watch"
   },
   "keywords": [],
-  "author": "",
+  "author": "julyL",
   "license": "ISC",
   "devDependencies": {
     "assert": "^1.4.1",
@@ -25,7 +25,5 @@
     "rollup-plugin-uglify": "1.0.1",
     "rollup-watch": "^4.3.1"
   },
-  "dependencies": {
-
-  }
+  "dependencies": {}
 }

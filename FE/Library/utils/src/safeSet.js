@@ -36,7 +36,7 @@
  *             * 根据key值和newArrayIfNeed  obj[k]={}或[]  下一个key?ob=obj[k]并重复A: obj[k]=result 
  * 
  */
-function _newObjorArray(key, newArrayIfNeed) {
+function _newObjectOrArray(key, newArrayIfNeed) {
   if (newArrayIfNeed && parseInt(key) == key && /^(([1-9]\d*)|0)$/.test(key)) {
     return new Array(parseInt(key)); //  new Array("1") => ["1"]    -_-!!!
   } else {
@@ -47,41 +47,44 @@ function _newObjorArray(key, newArrayIfNeed) {
 function safeSet(obj, path, result, newArrayIfNeed) {
   if (Array.isArray(path)) {
     var ob = obj,
-      ArrayObj = [];
+      ArrayObj = [],
+      key,
+      val;
     for (var i = 0, len = path.length; i <= len - 1; i++) {
+      key = path[i];
       if (typeof ob == "object" && ob != null) {
         ArrayObj.push(ob);
-        val = ob[path[i]];
+        val = ob[key];
         if (val) {
           if (typeof val == "object") {
             //(代码C)
-            ob[path[i]] = val;
-            ob = ob[path[i]];
+            ob[key] = val;
           } else {
             //
             if (i == len - 1) {
-              ob[path[i]] = result;
-              ob = ob[path[i]];
+              ob[key] = result;
             } else {
-              ob[path[i]] = _newObjorArray(path[i + 1], newArrayIfNeed);
-              ob = ob[path[i]];
+              ob[key] = _newObjectOrArray(path[i + 1], newArrayIfNeed);
             }
           }
         } else {
           if (i == len - 1) {
-            ob[path[i]] = result;
-            ob = ob[path[i]];
+            ob[key] = result;
           } else {
-            ob[path[i]] = _newObjorArray(path[i + 1], newArrayIfNeed);
-            ob = ob[path[i]];
+            ob[key] = _newObjectOrArray(path[i + 1], newArrayIfNeed);
           }
         }
       } else {
         // (代码B)
-        ob = _newObjorArray(path[i], newArrayIfNeed);
+        ob = _newObjectOrArray(key, newArrayIfNeed);
         ArrayObj.push(ob);
-        ob[path[i]] = val;
+        if (i == len - 1) {
+          ob[key] = result;
+        } else {
+          ob[key] = _newObjectOrArray(path[i + 1], newArrayIfNeed);
+        }
       }
+      ob = ob[key];
     }
     return ArrayObj[0];
   } else if (typeof path == "string") {
@@ -98,7 +101,7 @@ function safeSet(obj, path, result, newArrayIfNeed) {
   }
 }
 
-//var// obj1 = { a: 1 };
+//var obj1 = { a: 1 };
 // safeSet(obj1,'b.c[1]',2)
 // safeSet(obj1,'b.c[1]',2,true) // => {a:1,b:{c:[,2]}}
 
@@ -106,7 +109,7 @@ function safeSet(obj, path, result, newArrayIfNeed) {
 // safeSet(obj2,'1','wtf') // => {"1":'wtf'}
 // safeSet(obj2,'1','wtf',true) // => {1:'wtf'} // 只有当取的key值的父级(obj2)不为对象时,并且newArrayIfNeed==true 才会新建数组
 
-//var obj3 = 2;
-// safeSet(obj2,'1','wtf')  //=> {"1":'wtf'}
-//safeSet(obj3, "1", "wtf", true); //=> ["1":'wtf']
+//var obj3 = 3;
+//safeSet(obj3,'[1].b.c','wtf')  // =>  {1:b:{c:'wtf'}}
+//safeSet(obj3,'[1].b.c','wtf',true)  // =>  [,{b:{c:'wth'}}]
 export default safeSet;

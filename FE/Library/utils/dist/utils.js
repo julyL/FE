@@ -4,12 +4,56 @@
 	(factory((global.utils = {})));
 }(this, (function (exports) { 'use strict';
 
+function leftpad(v) {
+  return v < 10 ? "0" + v : v;
+}
+function countdown(startDate, endDate, formatStr) {
+  if (!endDate) {
+    endDate = startDate;
+    startDate = 0;
+  }
+  var temp = (endDate - startDate) / 1000,
+      day = Math.floor(temp / 86400),
+      hour = Math.floor(temp % 86400 / 3600),
+      minute = Math.floor(temp % 3600 / 60),
+      second = Math.floor(temp % 60),
+      millisecond = Math.floor((endDate - startDate) % 1000);
+
+  var dateObj = {
+    DD: leftpad(day),
+    D: day,
+    hh: leftpad(hour),
+    h: hour,
+    mm: leftpad(minute),
+    m: minute,
+    ss: leftpad(second),
+    s: second
+  };
+  var regObj = {
+    DD: /DD/,
+    D: /D/,
+    hh: /hh/,
+    h: /h/,
+    mm: /mm/,
+    m: /m/,
+    ss: /ss/,
+    s: /s/
+  };
+  if (formatStr) {
+    for (var i in regObj) {
+      formatStr = formatStr.replace(regObj[i], dateObj[i]);
+    }
+  } else {
+    return { day: day, hour: hour, minute: minute, second: second, millisecond: millisecond };
+  }
+}
+
 /*
   YYYY-MM-DD hh:MM:SS   =>  2016-08-22 04:50:40
   YYYY年MM月DD日 hh时MM分SS秒  =>  2016年8月22日 05时50分40秒
  */
 
-function leftpad(v) {
+function leftpad$1(v) {
   return v < 10 ? "0" + v : v;
 }
 
@@ -25,15 +69,15 @@ function formatDate(time, formatStr) {
   var dateObj = {
     YY: year,
     Y: String(year).slice(-2),
-    MM: leftpad(month),
+    MM: leftpad$1(month),
     M: month,
-    DD: leftpad(day),
+    DD: leftpad$1(day),
     D: day,
-    hh: leftpad(hour),
+    hh: leftpad$1(hour),
     h: hour,
-    mm: leftpad(minute),
+    mm: leftpad$1(minute),
     m: minute,
-    ss: leftpad(second),
+    ss: leftpad$1(second),
     s: second
   };
   var regObj = {
@@ -159,50 +203,6 @@ function parseDate(dat) {
     shortMonthName: shortMonthNames[month - 1],
     longMonthName: longMonthNames[month - 1]
   };
-}
-
-function leftpad$1(v) {
-  return v < 10 ? "0" + v : v;
-}
-function countdown(startDate, endDate, formatStr) {
-  if (!endDate) {
-    endDate = startDate;
-    startDate = 0;
-  }
-  var temp = (endDate - startDate) / 1000,
-      day = Math.floor(temp / 86400),
-      hour = Math.floor(temp % 86400 / 3600),
-      minute = Math.floor(temp % 3600 / 60),
-      second = Math.floor(temp % 60),
-      millisecond = Math.floor((endDate - startDate) % 1000);
-
-  var dateObj = {
-    DD: leftpad$1(day),
-    D: day,
-    hh: leftpad$1(hour),
-    h: hour,
-    mm: leftpad$1(minute),
-    m: minute,
-    ss: leftpad$1(second),
-    s: second
-  };
-  var regObj = {
-    DD: /DD/,
-    D: /D/,
-    hh: /hh/,
-    h: /h/,
-    mm: /mm/,
-    m: /m/,
-    ss: /ss/,
-    s: /s/
-  };
-  if (formatStr) {
-    for (var i in regObj) {
-      formatStr = formatStr.replace(regObj[i], dateObj[i]);
-    }
-  } else {
-    return { day: day, hour: hour, minute: minute, second: second, millisecond: millisecond };
-  }
 }
 
 function isElement(node) {
@@ -501,6 +501,287 @@ function safeGet(obj, path) {
   }
 }
 
+var babelHelpers = {};
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+  return typeof obj;
+} : function (obj) {
+  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+};
+
+
+
+
+
+var asyncGenerator = function () {
+  function AwaitValue(value) {
+    this.value = value;
+  }
+
+  function AsyncGenerator(gen) {
+    var front, back;
+
+    function send(key, arg) {
+      return new Promise(function (resolve, reject) {
+        var request = {
+          key: key,
+          arg: arg,
+          resolve: resolve,
+          reject: reject,
+          next: null
+        };
+
+        if (back) {
+          back = back.next = request;
+        } else {
+          front = back = request;
+          resume(key, arg);
+        }
+      });
+    }
+
+    function resume(key, arg) {
+      try {
+        var result = gen[key](arg);
+        var value = result.value;
+
+        if (value instanceof AwaitValue) {
+          Promise.resolve(value.value).then(function (arg) {
+            resume("next", arg);
+          }, function (arg) {
+            resume("throw", arg);
+          });
+        } else {
+          settle(result.done ? "return" : "normal", result.value);
+        }
+      } catch (err) {
+        settle("throw", err);
+      }
+    }
+
+    function settle(type, value) {
+      switch (type) {
+        case "return":
+          front.resolve({
+            value: value,
+            done: true
+          });
+          break;
+
+        case "throw":
+          front.reject(value);
+          break;
+
+        default:
+          front.resolve({
+            value: value,
+            done: false
+          });
+          break;
+      }
+
+      front = front.next;
+
+      if (front) {
+        resume(front.key, front.arg);
+      } else {
+        back = null;
+      }
+    }
+
+    this._invoke = send;
+
+    if (typeof gen.return !== "function") {
+      this.return = undefined;
+    }
+  }
+
+  if (typeof Symbol === "function" && Symbol.asyncIterator) {
+    AsyncGenerator.prototype[Symbol.asyncIterator] = function () {
+      return this;
+    };
+  }
+
+  AsyncGenerator.prototype.next = function (arg) {
+    return this._invoke("next", arg);
+  };
+
+  AsyncGenerator.prototype.throw = function (arg) {
+    return this._invoke("throw", arg);
+  };
+
+  AsyncGenerator.prototype.return = function (arg) {
+    return this._invoke("return", arg);
+  };
+
+  return {
+    wrap: function (fn) {
+      return function () {
+        return new AsyncGenerator(fn.apply(this, arguments));
+      };
+    },
+    await: function (value) {
+      return new AwaitValue(value);
+    }
+  };
+}();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+babelHelpers;
+
+/**
+ * @param {处理的对象} obj 
+ * @param {路径:数组或者字符串} path 
+ * @param {设置的值} val 
+ * @param {当键值为正数字时,生成数组覆盖} toArray 
+ * var obj1={a:1};
+ * safeSet(obj1,'b.c[1]',2)  => {a:1,b:{c:{"1":2}}}
+ * safeSet(obj1,'b.c[1]',2,true)  => {a:1,b:{c:[,2]}}
+ * 
+ * var obj2={};
+ * safeSet(obj2,'1','wtf')  => {"1":'wtf'}
+ * safeSet(obj2,'1','wtf',true)  => {1:'wtf'} // 只有当取的key值的父级(obj2)不为对象时,并且newArrayIfNeed==true 才会新建数组
+ * 
+ * var obj3=2;
+ * safeSet(obj2,'1','wtf')  => {"1":'wtf'}
+ * safeSet(obj2,'1','wtf',true)  => ["1":'wtf']
+ * 
+ * 思路:
+ * obj表示对象  k:表示key  result:需要赋值的值
+ * * 判断能否取值 obj    (代码A)
+ *      * 能取值
+ *              * obj[k]是否存在 
+ *                    * 存在       
+ *                          *  obj[k]不是引用对象   (代码C)
+ *                                * 是否是最后一个key
+ *                                      * 是,obj[k]=result
+ *                                      * 不是
+ *                                          *根据下一个key值和newArrayIfNeed  obj[k]={}或[] 重复A
+ *                          *  obj[k]是引用对象   下一个key?ob=obj[k]并重复A: obj[k]=result                 
+ *                    * 不存在
+ *                          *  是否是最后一个key
+ *                                      * 是,obj[k]=result
+ *                                      * 不是
+ *                                          *根据下一个key值和newArrayIfNeed  obj[k]={}或[] 重复A=result 
+ *      * 不能取值   (代码B)
+ *             * 根据key值和newArrayIfNeed  obj[k]={}或[]  下一个key?ob=obj[k]并重复A: obj[k]=result 
+ * 
+ */
+function _newObjectOrArray(key, newArrayIfNeed) {
+  if (newArrayIfNeed && parseInt(key) == key && /^(([1-9]\d*)|0)$/.test(key)) {
+    return new Array(parseInt(key)); //  new Array("1") => ["1"]    -_-!!!
+  } else {
+    return {};
+  }
+}
+
+function safeSet(obj, path, result, newArrayIfNeed) {
+  if (Array.isArray(path)) {
+    var ob = obj,
+        ArrayObj = [],
+        key,
+        val;
+    for (var i = 0, len = path.length; i <= len - 1; i++) {
+      key = path[i];
+      if ((typeof ob === "undefined" ? "undefined" : _typeof(ob)) == "object" && ob != null) {
+        ArrayObj.push(ob);
+        val = ob[key];
+        if (val) {
+          if ((typeof val === "undefined" ? "undefined" : _typeof(val)) == "object") {
+            //(代码C)
+            ob[key] = val;
+          } else {
+            //
+            if (i == len - 1) {
+              ob[key] = result;
+            } else {
+              ob[key] = _newObjectOrArray(path[i + 1], newArrayIfNeed);
+            }
+          }
+        } else {
+          if (i == len - 1) {
+            ob[key] = result;
+          } else {
+            ob[key] = _newObjectOrArray(path[i + 1], newArrayIfNeed);
+          }
+        }
+      } else {
+        // (代码B)
+        ob = _newObjectOrArray(key, newArrayIfNeed);
+        ArrayObj.push(ob);
+        if (i == len - 1) {
+          ob[key] = result;
+        } else {
+          ob[key] = _newObjectOrArray(path[i + 1], newArrayIfNeed);
+        }
+      }
+      ob = ob[key];
+    }
+    return ArrayObj[0];
+  } else if (typeof path == "string") {
+    var arrKeys = path.split("."),
+        keys = [],
+        m;
+    arrKeys.forEach(function (k) {
+      if (m = k.match(/([^\[\]]+)|(\[\d+\])/g)) {
+        m = m.map(function (v) {
+          return v.replace(/\[(\d+)\]/, "$1");
+        });
+        [].push.apply(keys, m);
+      }
+    });
+    return safeSet(obj, keys, result, newArrayIfNeed);
+  }
+}
+
 /*
     依赖: Promise
     简单的依赖加载处理
@@ -659,6 +940,7 @@ exports.leftpad = leftpad$2;
 exports.throttle = throttle;
 exports.Url = Url;
 exports.safeGet = safeGet;
+exports.safeSet = safeSet;
 exports.asyncLoadJs = asyncLoadJs;
 exports.Base64 = Base64;
 
