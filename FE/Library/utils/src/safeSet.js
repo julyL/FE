@@ -55,18 +55,8 @@ function safeSet(obj, path, result, newArrayIfNeed) {
       if (typeof ob == "object" && ob != null) {
         ArrayObj.push(ob);
         val = ob[key];
-        if (val) {
-          if (typeof val == "object") {
-            //(代码C)
-            ob[key] = val;
-          } else {
-            //
-            if (i == len - 1) {
-              ob[key] = result;
-            } else {
-              ob[key] = _newObjectOrArray(path[i + 1], newArrayIfNeed);
-            }
-          }
+        if (val && val == "object") {
+          ob[key] = val;
         } else {
           if (i == len - 1) {
             ob[key] = result;

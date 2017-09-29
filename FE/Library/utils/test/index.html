@@ -50,7 +50,7 @@
         var it = function (fn, shouldtobe) {
             var r = eval("utils." + fn),
                 item = "<div class='it'>" + fn + "</div>  " +
-                "<div class='result'>=>" + addSpace(4) + (typeof r == 'object' ? format(r) : r) +
+                "<div class='result'>=>" + addSpace(1) + (typeof r == 'object' ? format(r) : r) +
                 "</div>";
             return {
                 html: item,
@@ -63,7 +63,7 @@
                 space = '';
             while (i < num) {
                 i++;
-                space += "&nbsp;&nbsp;"
+                space += "&nbsp;&nbsp;&nbsp;&nbsp;"
             }
             return space;
         }
@@ -71,7 +71,7 @@
         function format(obj, zindex) {
             var str = "",
                 objStr,
-                zindex = zindex || 1,
+                zindex = zindex || 3,
                 temp = zindex;
             for (var i in obj) {
                 if (obj.hasOwnProperty(i)) {
@@ -80,15 +80,15 @@
                     } else {
                         objStr = obj[i];
                     }
-                    str += addSpace(zindex) + i + " : " + objStr + ",</br>"
+                    str += addSpace(temp) + i + " : " + objStr + ",</br>"
                     str = str.replace(/,<\/br>$/, '</br>');
                 }
             }
             if (typeof obj == 'object') {
                 if (Array.isArray(obj)) {
-                    str = "[" + str + addSpace(zindex) + "]";
+                    str = "[</br>" + str + addSpace(temp - 1) + "]";
                 } else {
-                    str = "{</br>" + str + addSpace(temp) + "}";
+                    str = "{</br>" + str + addSpace(temp - 1) + "}";
                 }
             }
             return str;

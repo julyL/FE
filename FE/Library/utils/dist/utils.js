@@ -4,6 +4,17 @@
 	(factory((global.utils = {})));
 }(this, (function (exports) { 'use strict';
 
+/*
+  获取2个时间之内剩余的时间(天,小时等) 一般用于倒计时 
+  countdown(3666006)
+   => {
+    day : 0,
+    hour : 1,
+    minute : 1,
+    second : 6,
+    millisecond : 6
+  }
+*/
 function leftpad(v) {
   return v < 10 ? "0" + v : v;
 }
@@ -287,6 +298,12 @@ function offset(el) {
   }
 })();
 
+/**
+ * 
+ * @param {需要滚动的元素} el 
+ * @param {滚动到的位置} to 
+ * @param {滚动时间} time 
+ */
 function scrollTo(el) {
   var to = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
   var time = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 300;
@@ -312,6 +329,16 @@ function scrollTo(el) {
 }
 
 // 自己的版本
+/** underscore版本
+
+debounce(function, wait, [immediate])
+返回 function 函数的防抖版本, 将延迟函数的执行(真正的执行)在函数最后一次调用时刻的 wait 毫秒之后.
+传参 immediate 为 true， debounce会在 wait 时间间隔的开始调用这个函数 。（注：并且在 wait 的时间之内，不会再次调用。）
+
+debounce(func,wait)
+debounce(func,wait,true)
+ */
+
 function debounce(func, wait, immediate) {
   var timeout, args, context, timestamp, result;
 
@@ -371,6 +398,24 @@ function leftpad$2(str, len, ch) {
 
 // 自己的版本   leading为真表示第一次立即执行,随后的执行wait之内只触发一次
 // 节流:   当频繁调用throttle(func,wait)时, wait时间之内只能执行一次func
+/**
+
+以下为underscore版本
+
+创建并返回一个像节流阀一样的函数，当重复调用函数的时候，最多每隔 wait毫秒调用一次该函数。
+默认情况下，throttle将在你调用的第一时间尽快执行这个function，并且，如果你在wait周期内调用任意次数的函数，都将尽快的被覆盖。
+
+禁用第一次首先执行，设置{leading: false}
+禁用最后一次执行，设置{trailing: false}
+
+ throttle(fn,wait)
+ throttle(fn,wait,{leading:false})
+ throttle(fn,wait,{trailing:false})
+
+ throttle(fn,wait,{leading:false,trailing:false})  
+ 错误调用: fn不会执行    remaining === wait && options.trailing === false
+
+ */
 function throttle(func, wait, options) {
   var context, args, result;
   var timeout = null;
@@ -734,18 +779,8 @@ function safeSet(obj, path, result, newArrayIfNeed) {
       if ((typeof ob === "undefined" ? "undefined" : _typeof(ob)) == "object" && ob != null) {
         ArrayObj.push(ob);
         val = ob[key];
-        if (val) {
-          if ((typeof val === "undefined" ? "undefined" : _typeof(val)) == "object") {
-            //(代码C)
-            ob[key] = val;
-          } else {
-            //
-            if (i == len - 1) {
-              ob[key] = result;
-            } else {
-              ob[key] = _newObjectOrArray(path[i + 1], newArrayIfNeed);
-            }
-          }
+        if (val && val == "object") {
+          ob[key] = val;
         } else {
           if (i == len - 1) {
             ob[key] = result;

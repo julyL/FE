@@ -36,6 +36,5 @@ test("Base64.encode('base64编码的内容')");
 
 test("Base64.decode('YmFzZTY057yW56CB55qE5YaF5a65')==='base64编码的内容'");
 
-var obj3 = 3;
-test("safeSet(obj3,'[1].b.c','wtf')");
-test("safeSet(obj3,'[1].b.c','wtf',true)");
+test("safeSet({a:233},'[1].b[1].c','wtf')");
+test("safeSet({a:233},'[1]b[1].c','wtf',true)");
