@@ -33,6 +33,10 @@ function exec(src) {
 }
 
 function asyncLoadJs(dependencies) {
-  return Promise.all(dependencies.map(exec));
+  if (Array.isArray(dependencies)) {
+    return Promise.all(dependencies.map(exec));
+  } else {
+    return exec(dependencies);
+  }
 }
 export default asyncLoadJs;
