@@ -1,6 +1,5 @@
 /*
   https://github.com/xieranmaya/blog/issues/3
-  
 */
 try {
     module.exports = Promise

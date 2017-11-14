@@ -1,18 +1,18 @@
-   //例1:
+//例1:
    // bad:
    loadSomething().then(function(something) {
            loadAnotherthing().then(function(anthor) {
                DoSomethingOnThem(something, anthor);
            })
        })
-       //fixed:  loadAnotherthing需要在loadSomething之后才能执行
+   //fixed:  loadAnotherthing需要在loadSomething之后才能执行
    loadSomething().then(function(something) {
        return loadAnotherthing()
    }).then(function(anthor) {
        DoSomethingOnThem(something, anthor);
    })
 
-   //例2：
+//例2: promise链式调用
    var doSomethingAsync = function(val) {
        var time = +new Date() % 2 === 0 ? 100 : 200;
        return new Promise(function(re) {
@@ -51,9 +51,8 @@
        }, Promise.resolve())
    }
 
-
-   //例3
-   //bad:  somethingElseAsync异常无法捕获
+//例3
+    //bad:  somethingElseAsync异常无法捕获
    somethingAync.then(function() {
            return somethingElseAsync();
        }, function(err) {
