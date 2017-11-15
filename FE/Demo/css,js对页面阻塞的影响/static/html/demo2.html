@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        div {
+            width: 100px;
+            height: 100px;
+            background: green;
+        }
+    </style>
+</head>
+
+<body>
+    <script src="../block.js?5000"></script>
+    <div>js会阻塞dom的解析和渲染</div>
+    <script>
+        console.log('block.js和log.js之间的内容');
+    </script>
+    <script src="../log.js"></script>
+</body>
+</html>

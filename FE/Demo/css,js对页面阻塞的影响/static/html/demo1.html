@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        div {
+            width: 100px;
+            height: 100px;
+            background: green;
+        }
+    </style>
+</head>
+<body>
+    <div>css阻塞dom的解析,但会阻塞页面渲染</div>
+    <script src="../block.js"></script>
+    <link rel="stylesheet" href="../style.css?2000">
+</body>
+</html>
