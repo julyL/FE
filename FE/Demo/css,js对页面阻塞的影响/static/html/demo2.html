@@ -14,11 +14,23 @@
 </head>
 
 <body>
-    <script src="../block.js?5000"></script>
-    <div>js会阻塞dom的解析和渲染</div>
     <script>
-        console.log('block.js和log.js之间的内容');
+        var i=0;
+        var timer = setInterval(function () {
+            var div = document.querySelectorAll('div');
+            console.log('定时检测dom是否解析完成',++i);
+            if (div.length > 1) {
+                console.log('dom 解析完成');
+                clearInterval(timer);
+            }
+        }, 1000)
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('DOMContentLoaded');
+        }, false);
     </script>
-    <script src="../log.js"></script>
+    <div>js会阻塞dom的解析和渲染</div>
+    <script src="../block.js?5000"></script>
+    <div></div>
 </body>
+
 </html>
