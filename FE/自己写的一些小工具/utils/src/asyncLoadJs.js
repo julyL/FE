@@ -1,10 +1,27 @@
-/*
-    依赖: Promise
-    简单的依赖加载处理
-    asyncLoadJS(['a.js', 'b.js']).then(() => console.log('all done'));
-*/
+/**
+ * 依赖Promise
+ * asyncLoadJS(['a.js', 'b.js']).then(() => console.log('all done'));   // a.js和b.js没有依赖关系
+ * asyncLoadJS(['a.js', 'b.js'],true).then(() => console.log('load a then load b'));   // a.js加载完再加载b.js
+ * @param {Array} arrayJs 数组里面存放了需要下载的js的url
+ * @param {bollean} bysort  数组中的下载执行顺序是否按照数组顺序
+ */
+function asyncLoadJs(arrayJs, bysort) {
+  if (Array.isArray(arrayJs)) {
+    if (!bysort) {
+      return Promise.all(arrayJs.map(loadJs));
+    } else {
+      arrayJs.reduce((prev, now) => {
+        return prev.then(() => {
+          return loadJs(now);
+        })
+      }, Promise.resolve())
+    }
+  } else {
+    return loadJs(arrayJs);
+  }
+}
 
-function exec(src) {
+function loadJs(src) {
   const script = document.createElement("script");
   script.src = src;
 
@@ -13,12 +30,7 @@ function exec(src) {
     var done = false;
 
     script.onload = script.onreadystatechange = () => {
-      if (
-        !done &&
-        (!script.readyState ||
-          script.readyState === "loaded" ||
-          script.readyState === "complete")
-      ) {
+      if (!done && (!script.readyState || script.readyState === "loaded" || script.readyState === "complete")) {
         done = true;
 
         // 避免内存泄漏
@@ -26,17 +38,15 @@ function exec(src) {
         resolve(script);
       }
     };
+    script.onerror = function () {
+      reject(src + " load fail");
+    }
 
     script.onerror = reject;
-    document.getElementsByTagName("head")[0].appendChild(script);
+    document
+      .getElementsByTagName("head")[0]
+      .appendChild(script);
   });
 }
 
-function asyncLoadJs(dependencies) {
-  if (Array.isArray(dependencies)) {
-    return Promise.all(dependencies.map(exec));
-  } else {
-    return exec(dependencies);
-  }
-}
 export default asyncLoadJs;
