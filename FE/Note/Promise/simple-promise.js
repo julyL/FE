@@ -43,7 +43,7 @@ function Promise(executor) {
     }
 }
 
-function resolvePromise(promise2, x, resolve, reject) {   // 对应文档 [[Resolve]](promise,x) 
+function resolvePromise(promise2, x, resolve, reject) {   // 对应文档 [[Resolve]](promise,x)  作用: 根据x确定promise2的状态
     // promise2 = promise1.then(onFulfilled, onRejected);  resolve和reject用于改变promise2的状态
     var then
     var thenCalledOrThrow = false
@@ -52,12 +52,11 @@ function resolvePromise(promise2, x, resolve, reject) {   // 对应文档 [[Reso
         return reject(new TypeError('Chaining cycle detected for promise!'))
     }
 
-    if (x instanceof Promise) {   //如果x为 Promise,则使 promise 接受 x 的状态 
+    if (x instanceof Promise) {
         if (x.status === 'pending') {
             x
-                .then(function (v) {     
-                // 如果x执行resolve函数,并且resolve(ortherPromise)中传入了另一个promise,则promise2的状态会根据ortherPromise来定
-                    resolvePromise(promise2, v, resolve, reject)
+                .then(function (v) {      
+                    resolvePromise(promise2, v, resolve, reject)   
                 }, reject)
         } else { //  已经确定状态时，执行相应的resolve或者rejecct即可
             x.then(resolve, reject)
@@ -111,12 +110,18 @@ Promise.prototype.then = function (onResolved, onRejected) {
         }
     if (self.status === 'resolved') {
         return promise2 = new Promise(function (resolve, reject) {
+    /*
+        例如 promise2 = new Promise((resolve,reject)=>{
+            resolve()
+        }).then(()=>{
+            return x   // x可能为promise对象或者thenable对象
+        })
+
+    */
             setTimeout(function () { // 异步执行onResolved
                 try {
-                    //文档: 如果 onFulfilled 或者 onRejected 返回一个值 x ，则运行下面的 Promise 解决过程: [[Resolve]](promise2, x)
-                    // 但这样写无法处理 self.data为promise对象或者thenable的情况 (原生Promise可以处理)
-                    var x = onResolved(self.data)    
-                    resolvePromise(promise2, x, resolve, reject)
+                    var x = onResolved(self.data)   // 这样写是同步执行的,无法处理 resolve(anotherPromsie)的情况。 原生Promise对象会等到anotherPromise对象resolved之后再处理promise2的对象
+                    resolvePromise(promise2, x, resolve, reject)  // 根据x来确定promise2的状态
                 } catch (reason) {
                     reject(reason)
                 }
