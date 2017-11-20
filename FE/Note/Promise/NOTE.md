@@ -1,6 +1,6 @@
 #### 知识点
 ```
-1. Promise接受的函数是同步执行的,但then是异步执行的  //demo1
+1. Promise接受的函数是同步执行的,但then方法里面的处理函数是异步执行的  //demo1
 
 2. Promise中的异常只要被处理了,后续的then方法将会执行成功的回调函数    //demo2
 
@@ -17,7 +17,7 @@ micro-task: process.nextTick, Promises(这里指浏览器实现的原生 Promise
 }) 
 //resolve本身的执行时是异步的
 //当resolve中传入promise对象或者thenable对象时,会嵌套一层异步。
-//因为会执行一次resolve1, 再执行一次resolve2或者reject2(后者用于改变promise2的状态) 
+//因为会执行一次resolve1, 再执行一次resolve2或者reject2(改变promise2状态的时候) 
 
 
 ```
@@ -31,3 +31,11 @@ https://juejin.im/post/597724c26fb9a06bb75260e8
 http://www.jianshu.com/p/12b9f73c5a4f
 
 https://github.com/xieranmaya/blog/issues/3
+
+
+
+```
+//测试代码
+npm i -g promises-aplus-tests
+promises-aplus-tests Promise.js
+```

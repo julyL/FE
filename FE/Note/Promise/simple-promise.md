@@ -3,7 +3,7 @@
 ```
 Promise构造函数: 
 
-以下方式执行传入的函数executor
+核心逻辑如下 (executor为传入的函数)
     try {
         executor(resolve, reject)
     } catch (reason) {
@@ -24,9 +24,9 @@ then方法里面的re对应成功之后该做的事,re对应失败之后该做�
 ```
 
 ```
+promise2 = promise1.then(onFulfilled, onRejected); 
 then方法:  根据promise1返回一个新的Promise对象promise2
 
-promise2 = promise1.then(onFulfilled, onRejected);  
 执行then方法时promise1的状态有3种情况(resolved,rejected,pending)
 
 resolved情况处理方法如下
@@ -52,22 +52,20 @@ pending情况 就是把上面resolved情况和rejected情况的处理方法分�
 ```
 
 ```
-resolvePromise方法:
+resolvePromise方法: 简单的讲就是根据x觉得promise2的状态
 
 resolvePromise(promise2, x, resolve, reject)
 
-promise2 = promise1.then(()=>{
-    return x
-}), onRejected);  
-
-如果x为promise对象,则根据这个对象的状态决定promise2的状态
-
-如果x为thenable对象,则尝试根据这个对象的状态决定promise2的状态
+x为执行promise1的onResolved(self.data) 返回值
+resolve,reject为改变promise2状态的方法   //promise2 = new Promise(function (resolve, reject) 
 
 ```
 
+```
+虽然simple-promise通过了promises-aplus-tests simple-promise.js的测试
+但是由于地方的处理和原生Promise还是存在差异的 例如: demo7
 
-
+```
 
 
 

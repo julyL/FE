@@ -52,17 +52,11 @@ function resolvePromise(promise2, x, resolve, reject) {   // 对应文档 [[Reso
         return reject(new TypeError('Chaining cycle detected for promise!'))
     }
 
-    if (x instanceof Promise) {
+    if (x instanceof Promise) {   //如果x为 Promise,则使 promise 接受 x 的状态 
         if (x.status === 'pending') {
-        /*
-        需要注意,执行x的成功方法，并不能简单的执行resolve将promise2的状态定为resolved
-        例如 x = new Promise((resolve,reject)=>{
-            resolve([里面的值可能为promise对象或者thenable对象])  //虽然x执行resolve方法,但是 x的状态还是要根据resolve里面的值来进行判断
-        })
-
-        */
             x
-                .then(function (v) {
+                .then(function (v) {     
+                // 如果x执行resolve函数,并且resolve(ortherPromise)中传入了另一个promise,则promise2的状态会根据ortherPromise来定
                     resolvePromise(promise2, v, resolve, reject)
                 }, reject)
         } else { //  已经确定状态时，执行相应的resolve或者rejecct即可
@@ -119,7 +113,9 @@ Promise.prototype.then = function (onResolved, onRejected) {
         return promise2 = new Promise(function (resolve, reject) {
             setTimeout(function () { // 异步执行onResolved
                 try {
-                    var x = onResolved(self.data)
+                    //文档: 如果 onFulfilled 或者 onRejected 返回一个值 x ，则运行下面的 Promise 解决过程: [[Resolve]](promise2, x)
+                    // 但这样写无法处理 self.data为promise对象或者thenable的情况 (原生Promise可以处理)
+                    var x = onResolved(self.data)    
                     resolvePromise(promise2, x, resolve, reject)
                 } catch (reason) {
                     reject(reason)
