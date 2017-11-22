@@ -1,9 +1,15 @@
 /*!
- * @overview es6-promise - a tiny implementation of Promises/A+.
- * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
- * @license   Licensed under MIT license
- *            See https://raw.githubusercontent.com/stefanpenner/es6-promise/master/LICENSE
- * @version   4.1.0+f046478d
+  源码出处: https://raw.githubusercontent.com/stefanpenner/es6-promise/master/LICENSE
+
+  部分注释中用到的变量如下情况: 
+
+  @promise2 = @promise1.then(()=>{
+     resolve(@resolveValue)
+  }).then(@onFulfilled,@onRejected)
+
+  @Promise1.then(@executor)
+
+  state: Promise对象的状态(pending, resolved, rejected)
  */
 
 (function(global, factory) {
@@ -40,8 +46,8 @@
   var customSchedulerFn = undefined;
 
   var asap = function asap(callback, arg) {
-    queue[len] = callback;
-    queue[len + 1] = arg;
+    queue[len] = callback;  
+    queue[len + 1] = arg;   
     len += 2;
     if (len === 2) {
       // If len is 2, that means that we need to schedule an async flush.
@@ -67,7 +73,7 @@
   var browserGlobal = browserWindow || {};
   var BrowserMutationObserver =
     browserGlobal.MutationObserver || browserGlobal.WebKitMutationObserver;
-  var isNode =
+  var isNode =            // 判断是否是node环境
     typeof self === "undefined" &&
     typeof process !== "undefined" &&
     {}.toString.call(process) === "[object process]";
@@ -128,13 +134,14 @@
   }
 
   var queue = new Array(1000);
-  function flush() {
+  function flush() {    //通过process.nextTick等异步方式执行的函数
     for (var i = 0; i < len; i += 2) {
-      var callback = queue[i];
-      var arg = queue[i + 1];
+      var callback = queue[i];  // publish
+      var arg = queue[i + 1];   // args为promise对象
 
-      callback(arg);
-
+      callback(arg);   // publish(@promsise1)
+      
+      // 重置变量,设为初始值
       queue[i] = undefined;
       queue[i + 1] = undefined;
     }
@@ -154,7 +161,7 @@
   }
 
   var scheduleFlush = undefined;
-  // Decide what async method to use to triggering processing of queued callbacks:
+  // 根据代码执行环节,设置异步执行的函数 尽可能采用process.nextTick, MutationObserver等 micro-task,都不兼容的情况下采用setTimeout代替
   if (isNode) {
     scheduleFlush = useNextTick();
   } else if (BrowserMutationObserver) {
@@ -172,23 +179,23 @@
 
     var parent = this;
 
-    var child = new this.constructor(noop);
+    var child = new this.constructor(noop); // then方法返回的新的Promise对象
 
-    if (child[PROMISE_ID] === undefined) {
+      if (child[PROMISE_ID] === undefined) {
       makePromise(child);
     }
 
     var _state = parent._state;
 
-    if (_state) {
+    if (_state) {  // resolved或者rejected状态的处理
       (function() {
         var callback = _arguments[_state - 1];
         asap(function() {
           return invokeCallback(_state, child, callback, parent._result);
         });
       })();
-    } else {
-      subscribe(parent, child, onFulfillment, onRejection);
+    } else {    // pending状态
+      subscribe(parent, child, onFulfillment, onRejection);   //参数对应示例 child = parent.then(onFulfillment,onRejection)
     }
 
     return child;
@@ -315,8 +322,9 @@
       }
     }, promise);
   }
-
-  function handleOwnThenable(promise, thenable) {
+  
+  // @resolveValue是promise对象,根据@resolveValue的state 来设置@promise1的state
+  function handleOwnThenable(promise, thenable) {  // (@promise1, @resolveValue)
     if (thenable._state === FULFILLED) {
       fulfill(promise, thenable._result);
     } else if (thenable._state === REJECTED) {
@@ -335,13 +343,13 @@
     }
   }
 
-  function handleMaybeThenable(promise, maybeThenable, then$$1) {
+  function handleMaybeThenable(promise, maybeThenable, then$$1) {   // @promise1 , @resolveValue , @resolveValue的then方法
     if (
-      maybeThenable.constructor === promise.constructor &&
+      maybeThenable.constructor === promise.constructor &&      // 判断@resolveValue是否为本框架实现的Promsie对象
       then$$1 === then &&
       maybeThenable.constructor.resolve === resolve$1
     ) {
-      handleOwnThenable(promise, maybeThenable);
+      handleOwnThenable(promise, maybeThenable);   // @resolveValue是Promise
     } else {
       if (then$$1 === GET_THEN_ERROR) {
         reject(promise, GET_THEN_ERROR.error);
@@ -355,14 +363,16 @@
       }
     }
   }
-
-  function resolve(promise, value) {
+  
+  // resolve用于将pending状态的promise变为resolved
+  // 相比较于将resolve定义在promise构造函数的内部,这种定义方式对外隐藏resolve函数内部的实现,多传一个promise作为参数即可(相当于this的作用)
+  function resolve(promise, value) {  
     if (promise === value) {
       reject(promise, selfFulfillment());
-    } else if (objectOrFunction(value)) {
+    } else if (objectOrFunction(value)) {  // @resolveValue为对象或者函数的情况
       handleMaybeThenable(promise, value, getThen(value));
     } else {
-      fulfill(promise, value);
+      fulfill(promise, value);   // @resolveValue为普通值的情况
     }
   }
 
@@ -374,7 +384,8 @@
     publish(promise);
   }
 
-  function fulfill(promise, value) {
+
+  function fulfill(promise, value) {  // 用于处理普通值(非对象), fulfill(@promise1,@resolveValue)
     if (promise._state !== PENDING) {
       return;
     }
@@ -382,7 +393,7 @@
     promise._result = value;
     promise._state = FULFILLED;
 
-    if (promise._subscribers.length !== 0) {
+    if (promise._subscribers.length !== 0) {  //
       asap(publish, promise);
     }
   }
@@ -397,7 +408,8 @@
     asap(publishRejection, promise);
   }
 
-  function subscribe(parent, child, onFulfillment, onRejection) {
+  // 将then方法中的@onFulfilled和@onRejected放入@promsie1的任务队列
+  function subscribe(parent, child, onFulfillment, onRejection) {   // (@promise1, @promsie2, @onFulfilled, @onRejected)
     var _subscribers = parent._subscribers;
     var length = _subscribers.length;
 
@@ -407,8 +419,8 @@
     _subscribers[length + FULFILLED] = onFulfillment;
     _subscribers[length + REJECTED] = onRejection;
 
-    if (length === 0 && parent._state) {
-      asap(publish, parent);
+    if (length === 0 && parent._state) {  
+      asap(publish, parent);     // @promsie1的状态已经确定(resovled或者rejected)并且执行then方法之前任务队列为空时才执行
     }
   }
 
@@ -424,18 +436,19 @@
       callback = undefined,
       detail = promise._result;
 
-    for (var i = 0; i < subscribers.length; i += 3) {
+    // 执行队列中所有的函数
+    for (var i = 0; i < subscribers.length; i += 3) {   // subscriber数组中存储的数据: 3n为promsied对象 3n+1为resolved时的处理函数  3n+2则对应rejected
       child = subscribers[i];
-      callback = subscribers[i + settled];
+      callback = subscribers[i + settled];  //根据promise的status获取相应的处理函数  
 
       if (child) {
-        invokeCallback(settled, child, callback, detail);
+        invokeCallback(settled, child, callback, detail);  // invokeCallback(state状态码, @promise2, 根据state获取的处理函数,@resolveValue )
       } else {
-        callback(detail);
+        callback(detail);   // 当@resolveValue为promise对象时并且没有设置过@resolveValue.then 
       }
     }
 
-    promise._subscribers.length = 0;
+    promise._subscribers.length = 0;   // @promise1的任务队列执行完以后清空队列，以供后续可以接着添加队列
   }
 
   function ErrorObject() {
@@ -453,15 +466,15 @@
     }
   }
 
-  function invokeCallback(settled, promise, callback, detail) {
+  function invokeCallback(settled, promise, callback, detail) {   // invokeCallback(state状态码, @promise2, 根据state获取的处理函数,@resolveValue )
     var hasCallback = isFunction(callback),
       value = undefined,
       error = undefined,
       succeeded = undefined,
       failed = undefined;
 
-    if (hasCallback) {
-      value = tryCatch(callback, detail);
+    if (hasCallback) { // 判断@onFulfilled否为函数
+      value = tryCatch(callback, detail);    // 执行 @onFulfilled(@resolveValue)
 
       if (value === TRY_CATCH_ERROR) {
         failed = true;
@@ -471,11 +484,11 @@
         succeeded = true;
       }
 
-      if (promise === value) {
+      if (promise === value) {  // 如果 @promise2 === @resolveValue 则报错
         reject(promise, cannotReturnOwn());
         return;
       }
-    } else {
+    } else {   
       value = detail;
       succeeded = true;
     }
@@ -493,9 +506,9 @@
     }
   }
 
-  function initializePromise(promise, resolver) {
+  function initializePromise(promise, resolver) {   // 执行@executor(@onFulfilled,@onRejected)
     try {
-      resolver(
+      resolver(    // 传入resolve或reject时的处理函数
         function resolvePromise(value) {
           resolve(promise, value);
         },
@@ -912,11 +925,11 @@
   @constructor
 */
   function Promise$2(resolver) {     // Promise构造函数
-    this[PROMISE_ID] = nextId();
+    this[PROMISE_ID] = nextId();     // 设置一个key为随机数,value为从0递增的数字
     this._result = this._state = undefined;
     this._subscribers = [];
 
-    if (noop !== resolver) {
+    if (noop !== resolver) {    // 调用then方法时创建新的promise对象时 noop===resolver
       typeof resolver !== "function" && needsResolver();   // Promise构造函数的参数必须为函数
       this instanceof Promise$2         // 构造函数必须通过new构造
         ? initializePromise(this, resolver) : needsNew();
