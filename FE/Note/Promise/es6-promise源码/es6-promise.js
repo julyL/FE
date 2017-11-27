@@ -2,14 +2,25 @@
   源码出处: https://raw.githubusercontent.com/stefanpenner/es6-promise/master/LICENSE
 
   部分注释中用到的变量如下情况: 
-
   @promise2 = @promise1.then(()=>{
      resolve(@resolveValue)
   }).then(@onFulfilled,@onRejected)
 
-  @Promise1.then(@executor)
+  @resolver: Promise构造函数中传入的参数
+  state: Promise对象的状态 (pending, resolved, rejected)
 
-  state: Promise对象的状态(pending, resolved, rejected)
+  源码中变量说明:
+  parent => @promise1
+  child => @promise2
+  detail, _result, value => @resolveValue
+  _state, settled => state
+  _subscribers => [    // Promise对象用于存储任务队列的数组 
+    @promise2,         // 3n
+    @onFulfilled,      // 3n+1
+    @onRejected,       // 3n+2
+    ...
+  ]
+
  */
 
 (function(global, factory) {
@@ -196,6 +207,7 @@
       })();
     } else {    // pending状态
       subscribe(parent, child, onFulfillment, onRejection);   //参数对应示例 child = parent.then(onFulfillment,onRejection)
+      // 在parent任务队列上订阅onFulfillment,onRejection函数
     }
 
     return child;
@@ -271,7 +283,7 @@
     );
   }
 
-  function getThen(promise) {
+  function getThen(promise) {   // 尝试获取then方法
     try {
       return promise.then;
     } catch (error) {
@@ -419,7 +431,7 @@
     _subscribers[length + FULFILLED] = onFulfillment;
     _subscribers[length + REJECTED] = onRejection;
 
-    if (length === 0 && parent._state) {  
+    if (length === 0 && parent._state) {    // ?
       asap(publish, parent);     // @promsie1的状态已经确定(resovled或者rejected)并且执行then方法之前任务队列为空时才执行
     }
   }
@@ -442,7 +454,8 @@
       callback = subscribers[i + settled];  //根据promise的status获取相应的处理函数  
 
       if (child) {
-        invokeCallback(settled, child, callback, detail);  // invokeCallback(state状态码, @promise2, 根据state获取的处理函数,@resolveValue )
+        invokeCallback(settled, child, callback, detail);  
+       //invokeCallback(@promise1的state, @promise2, @promise1的state对应的处理函数, @resolveValue )
       } else {
         callback(detail);   // 当@resolveValue为promise对象时并且没有设置过@resolveValue.then 
       }
@@ -466,7 +479,7 @@
     }
   }
 
-  function invokeCallback(settled, promise, callback, detail) {   // invokeCallback(state状态码, @promise2, 根据state获取的处理函数,@resolveValue )
+  function invokeCallback(settled, promise, callback, detail) {  //(@promise1的state, @promise2, @promise1的state对应的处理函数, @resolveValue)
     var hasCallback = isFunction(callback),
       value = undefined,
       error = undefined,
@@ -506,7 +519,7 @@
     }
   }
 
-  function initializePromise(promise, resolver) {   // 执行@executor(@onFulfilled,@onRejected)
+  function initializePromise(promise, resolver) {   // 执行@resolver(@onFulfilled,@onRejected)
     try {
       resolver(    // 传入resolve或reject时的处理函数
         function resolvePromise(value) {
@@ -929,7 +942,7 @@
     this._result = this._state = undefined;
     this._subscribers = [];
 
-    if (noop !== resolver) {    // 调用then方法时创建新的promise对象时 noop===resolver
+    if (noop !== resolver) {    // 调用then方法时创建新的promise对象时 noop === resolver ,不会执行以下代码
       typeof resolver !== "function" && needsResolver();   // Promise构造函数的参数必须为函数
       this instanceof Promise$2         // 构造函数必须通过new构造
         ? initializePromise(this, resolver) : needsNew();
