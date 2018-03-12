@@ -32,8 +32,8 @@ img[data-imglazy='lazyed'] {
 #### 效果演示
 
 访问示例:  
-[https://julyl.github.io/Code/code/imglazyload](https://julyl.github.io/Code/code/imglazyload)  (切换到手机模式)
+[https://julyl.github.io/FE/tools/imglazyload](https://julyl.github.io/FE/tools/imglazyload)  (切换到手机模式)
 
-[![](http://qr.api.cli.im/qr?data=https%253A%252F%252Fjulyl.github.io%252FCode%252Fcode%252Fimglazyload%252F&level=H&transparent=false&bgcolor=%23ffffff&forecolor=%23000000&blockpixel=12&marginblock=1&logourl=&size=280&kid=cliim&key=43a4e9cf9dee90ba7d69952f67a1a6c0)](https://julyl.github.io/Code/code/imglazyload)
+[![]()](http://qr.liantu.com/api.php?text=https%3A%2F%2Fjulyl.github.io%2FFE%2Ftools%2Fimglazyload)
 
 
