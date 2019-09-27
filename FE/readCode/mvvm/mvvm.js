@@ -7,7 +7,7 @@
  */
 
 // Define Property
-function def (obj, key, val, enumerable) {
+function def(obj, key, val, enumerable) {
   Object.defineProperty(obj, key, {
     value: val,
     enumerable: !!enumerable,
@@ -20,12 +20,12 @@ function def (obj, key, val, enumerable) {
  * @class 双向绑定类 MVVM
  * @param {[type]} options [description]
  */
-function MVVM (options) {
+function MVVM(options) {
   this.$options = options || {};
   let data = this._data = this.$options.data;
   let self = this;
 
-  Object.keys(data).forEach(key => {   
+  Object.keys(data).forEach(key => {
     self._proxyData(key);
   });
   observe(data, this);    // 遍历data,设置每个key的get和set,并设置一个dep实例
@@ -34,8 +34,8 @@ function MVVM (options) {
 MVVM.prototype = {
   _proxyData: function (key) {
     let self = this;
-    setter = Object.defineProperty(self, key, {   
-    // vm.datakey=val  =>  vm._data.datakey=val;  形成映射关系(datakey为vm的data属性里面的key)
+    setter = Object.defineProperty(self, key, {
+      // vm.datakey=val  =>  vm._data.datakey=val;  形成映射关系(datakey为vm的data属性里面的key)
       configurable: false,
       enumerable: true,
       get: function proxyGetter() {
@@ -49,7 +49,7 @@ MVVM.prototype = {
   $set: set,
   $delete: del
 }
-function set (target, key, val) {
+function set(target, key, val) {
   if (Array.isArray(target) && typeof key === 'number') {
     target.length = Math.max(target.length, key);
     target.splice(key, 1, val);
@@ -68,7 +68,7 @@ function set (target, key, val) {
   ob.dep.notify();
   return val;
 }
-function del (target, key) {
+function del(target, key) {
   if (Array.isArray(target) && typeof key === 'number') {
     target.splice(key, 1);
     return;
@@ -140,19 +140,19 @@ const arrayKeys = Object.getOwnPropertyNames(arrayMethods);
 const hasProto = '__proto__' in {};
 console.log(arrayMethods)
 // 直接将对象的 proto 指向 src这一组方法
-function protoAugment (target, src) {
+function protoAugment(target, src) {
   target.__proto__ = src;
 }
 
 // 遍历这一组方法，依次添加到对象中，作为隐藏属性（即 enumerable: false，不能被枚举）
-function copyAugment (target, src, keys) {
+function copyAugment(target, src, keys) {
   for (let i = 0, l = keys.length; i < l; i++) {
     let key = keys[i];
     def(target, key, src[key]);
   }
 }
 // 返回一个布尔值，指示对象是否具有指定的属性作为自身（不继承）属性
-function hasOwn (obj, key) {
+function hasOwn(obj, key) {
   return hasOwnProperty.call(obj, key)
 }
 
@@ -163,7 +163,7 @@ function observe(value) {     // 当传入的value为对象时,返回Observer实
   let ob;
   if (hasOwn(value, '__ob__') && value.__ob__ instanceof Observer) {    // 当value为Observer实例时,直接返回Obsever实例
     ob = value.__ob__;
-  } else  {
+  } else {
     ob = new Observer(value);
   }
   return ob
@@ -173,7 +173,7 @@ function Observer(value) {
   this.value = value;
   this.dep = new Dep();
   def(value, '__ob__', this);   //  在__ob__上存储this,用来标示当前value已通过new Observer(value)实例化
-  if (Array.isArray(value)) {  
+  if (Array.isArray(value)) {
     let augment = hasProto
       ? protoAugment
       : copyAugment;
@@ -198,13 +198,13 @@ Observer.prototype = {
   }
 }
 
-function defineReactive$$1 (obj, key, val) {
+function defineReactive$$1(obj, key, val) {
   let dep = new Dep();      //dep 负责执行“事件”的订阅和发布 (vm.data中的key值都对应一个dep实例,当key对应的val发生改变,会执行updaterFn来更新视图)   updaterFn也就是watcher实例中的cb(在初始化执行Compile时绑定的回调)
   let childOb = observe(val);  //递归处理
   Object.defineProperty(obj, key, {
     enumerable: true,
     configurable: true,
-    get: function() {
+    get: function () {
       // Dep.target用于存储临时的watcher对象
       if (Dep.target) {    //  Dep.target只有2种情况下会有值:  1.初始化watcher对象时(执行compiler)  2.watcher对象执行update方法时(触发了setter)   这2种情况都需要关联dep对象和watcher
         dep.depend();      //  在dep.subs中加入watcher对象     dep对象(发布者,执行notify方法通知watcher进行视图更新)  <==>  watcher对象(订阅者,执行update方法进行视图更新)
@@ -214,7 +214,7 @@ function defineReactive$$1 (obj, key, val) {
       }
       return val;
     },
-    set: function(newVal) {
+    set: function (newVal) {
       debugger;
       if (val === newVal || (newVal !== newVal && val !== val)) {   // 值相等 或者 为NaN的情况不需要更新
         return;
@@ -229,7 +229,7 @@ function defineReactive$$1 (obj, key, val) {
 }
 
 let uid = 0;
-function Dep() {        
+function Dep() {
   this.id = uid++;    // dep id
   this.subs = [];     // array 存储Watcher
 }
@@ -241,7 +241,7 @@ Dep.prototype = {
   removeSub: function (sub) {
     let index = this.subs.indexOf(sub);
     if (index !== -1) {
-      this.subs.splice(index ,1);
+      this.subs.splice(index, 1);
     }
   },
   // 通知数据变更
@@ -312,13 +312,13 @@ Watcher.prototype = {
     let exps = exp.split('.');
 
     // 简易的循环依赖处理
-    return function(obj) {
+    return function (obj) {
       debugger;
-        for (let i = 0, len = exps.length; i < len; i++) {  //循环取值  eg:  exp="a.b"   先往a对应的dep中push当前watcher对象, 再往b对应的dep中push当前watcher对象
-            if (!obj) return;
-            obj = obj[exps[i]];    // 这里会触发getter,从而关联watcher和dep
-        }
-        return obj;
+      for (let i = 0, len = exps.length; i < len; i++) {  //循环取值  eg:  exp="a.b"   先往a对应的dep中push当前watcher对象, 再往b对应的dep中push当前watcher对象
+        if (!obj) return;
+        obj = obj[exps[i]];    // 这里会触发getter,从而关联watcher和dep
+      }
+      return obj;
     }
   }
 }
@@ -344,7 +344,7 @@ Compile.prototype = {
     let childNodes = el.childNodes;
     [].slice.call(childNodes).forEach(node => {
       let text = node.textContent;
-      let reg = /\{\{((?:.|\n)+?)\}\}/;    
+      let reg = /\{\{((?:.|\n)+?)\}\}/;
 
       // 如果是element节点
       if (self.isElementNode(node)) {
@@ -430,7 +430,7 @@ const compileUtil = {
   class: function (node, vm, exp) {
     this.bind(node, vm, exp, 'class');
   },
-  model: function(node, vm, exp) {    //  exp='a' data中的key
+  model: function (node, vm, exp) {    //  exp='a' data中的key
     this.bind(node, vm, exp, 'model');
 
     let self = this;
@@ -454,12 +454,12 @@ const compileUtil = {
     let updaterFn = updater[dir + 'Updater'];                 // 根据dir返回相应更新视图的方法
     updaterFn && updaterFn(node, this._getVmVal(vm, exp));    // 进行视图的初始化
 
-    new Watcher(vm, exp, function(value, oldValue) {
+    new Watcher(vm, exp, function (value, oldValue) {
       updaterFn && updaterFn(node, value, oldValue);
     });
   },
   // 事件处理
-  eventHandler: function(node, vm, exp, dir) {
+  eventHandler: function (node, vm, exp, dir) {
     let eventType = dir.split(':')[1];
     let fn = vm.$options.methods && vm.$options.methods[exp];
 
@@ -499,7 +499,7 @@ const updater = {
   textUpdater: function (node, value) {
     node.textContent = typeof value === 'undefined' ? '' : value;
   },
-  classUpdater: function () {},
+  classUpdater: function () { },
   modelUpdater: function (node, value, oldValue) {
     if ($elm === node) {
       return false;
